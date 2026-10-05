@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+/* Qwizo design tokens — minimal, professional, calm.
+   Matches the existing vanilla app's visual identity. */
+@theme {
+  --color-accent: #2b5fe3;
+  --color-accent-hover: #1e4acb;
+  --color-ink: #0c1424;
+  --color-bg-soft: #f5f7fc;
+  --color-cta-dark: #0b1322;
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: #ffffff;
+  -webkit-font-smoothing: antialiased;
+}
