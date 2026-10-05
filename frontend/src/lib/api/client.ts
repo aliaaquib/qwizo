@@ -1,12 +1,17 @@
-// Typed API client for the existing Qwizo Worker API.
-// Endpoint shapes are unchanged from the vanilla frontend.
-
 import type {
   Teacher, Quiz, Question, BankItem, Submission, ApiError, QuestionType,
 } from '@/types';
 
+// Typed API client for the existing Qwizo Worker API.
+// Endpoint shapes are unchanged from the vanilla frontend.
+//
+// API base URL: defaults to relative paths (works with Vite dev proxy).
+// Set VITE_API_URL in production to point at the Cloudflare Worker.
+
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
 async function request<T>(path: string, opts: RequestInit = {}): Promise<T> {
-  const res = await fetch(path, {
+  const res = await fetch(`${API_BASE}${path}`, {
     ...opts,
     headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
     credentials: 'same-origin',
