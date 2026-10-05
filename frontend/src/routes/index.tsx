@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { ProtectedRoute, GuestRoute } from './guards';
 import { AppShell } from '@/components/AppShell';
+import { Landing } from '@/pages/Landing';
 import { Login } from '@/pages/Login';
 import { Signup } from '@/pages/Signup';
 import { Dashboard } from '@/pages/Dashboard';
@@ -52,6 +53,6 @@ export const router = createBrowserRouter([
   { path: '/quiz/:id', element: <TakeQuiz /> },
   { path: '/quiz/:id/results', element: <StudentResult /> },
   // Fallbacks
-  { path: '/', element: <Navigate to="/app" replace /> },
-  { path: '*', element: <Navigate to="/app" replace /> },
+  { path: '/', element: <Landing /> },
+  { path: '*', element: <Navigate to="/" replace /> },
 ]);
