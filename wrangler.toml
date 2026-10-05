@@ -1,0 +1,29 @@
+name = "qwizo"
+main = "worker/src/index.js"
+compatibility_date = "2025-06-01"
+
+# Workers AI — quiz generation (free tier, no card required)
+[ai]
+binding = "AI"
+
+# KV: email->user index, share-code->teacher index, rate limits
+[[kv_namespaces]]
+binding = "QWIZO_KV"
+id = "315b430639d54a3e98d7f386c0f3353f"
+
+# Durable Object with SQLite — one relational DB per teacher.
+# Natural isolation: a teacher's data is physically unreachable by others.
+[[durable_objects.bindings]]
+name = "TEACHER_STORE"
+class_name = "TeacherStore"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["TeacherStore"]
+
+# Static frontend (marketing page, teacher app, student pages)
+[assets]
+directory = "public"
+
+[vars]
+APP_NAME = "Qwizo"
