@@ -6,6 +6,7 @@
 @theme {
   /* Colors */
   --color-sky: #d6e3f2;        /* Qwizo Sky — soft blue surfaces */
+  --color-mist: #e4ecf9;       /* Qwizo Mist — pale blue section wash */
   --color-lime: #e2eb5d;       /* Qwizo Lime — signature accent, use sparingly */
   --color-ink: #444348;        /* Qwizo Ink — primary text */
   --color-paper: #fbfcfd;      /* Qwizo White — cards, surfaces */
@@ -24,6 +25,13 @@
   /* Shadows — extremely soft, flat/calm/expensive */
   --shadow-soft: 0 8px 30px rgba(40, 45, 55, 0.06);
   --shadow-lift: 0 12px 40px rgba(40, 45, 55, 0.09);
+
+  /* Motion — Qwizo motion system (see DESIGN_SYSTEM.md §20) */
+  --motion-fast: 150ms;
+  --motion-standard: 250ms;
+  --motion-emphasis: 400ms;
+  --motion-reveal: 600ms;
+  --ease-qwizo: cubic-bezier(0.22, 1, 0.36, 1);
 
   /* Layout */
   --breakpoint-content: 1280px;
@@ -53,3 +61,232 @@ body {
   line-height: 1.15;
   font-weight: 500;
 }
+
+/* Headline chip icon cycle */
+@keyframes chip-icon-pop {
+  0% { opacity: 0; transform: translateY(0.35em) scale(0.6); }
+  60% { opacity: 1; transform: translateY(-0.06em) scale(1.08); }
+  100% { opacity: 1; transform: none; }
+}
+.chip-icon-pop {
+  animation: chip-icon-pop 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Smooth section-to-section color melts (top blend, then solid) */
+.blend-paper-mist { background: linear-gradient(to bottom, #fbfcfd 0, #e4ecf9 10rem, #e4ecf9 100%); }
+.blend-mist-paper { background: linear-gradient(to bottom, #e4ecf9 0, #fbfcfd 10rem, #fbfcfd 100%); }
+.blend-paper-neutral { background: linear-gradient(to bottom, #fbfcfd 0, #f4f5f7 10rem, #f4f5f7 100%); }
+.blend-mist-neutral { background: linear-gradient(to bottom, #e4ecf9 0, #f4f5f7 10rem, #f4f5f7 100%); }
+.blend-neutral-paper { background: linear-gradient(to bottom, #f4f5f7 0, #fbfcfd 10rem, #fbfcfd 100%); }
+/* Problem section: full-bleed blue flowing from the hero, melting to paper. */
+/* Card version: the card's top and bottom edges dissolve into the gradient
+   via mask fade — no hard lines, sides stay crisp. */
+.problem-flow { background: linear-gradient(to bottom, #d6e4fa 0%, #d8e5f5 40%, #e7effc 72%, #fbfcfd 100%); }
+.card-melt {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 90px, #000 calc(100% - 60px), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 90px, #000 calc(100% - 60px), transparent 100%);
+}
+
+/* ============ Qwizo motion system (§20) ============ */
+/* Durations pair with the --ease-qwizo token (auto-generated utility). */
+.t-fast { transition-duration: var(--motion-fast); }
+.t-standard { transition-duration: var(--motion-standard); }
+.t-emphasis { transition-duration: var(--motion-emphasis); }
+.t-reveal { transition-duration: var(--motion-reveal); }
+
+/* Buttons: see the interaction system (§21) below — single recipe. */
+
+/* Cards: gentle lift on hover. Apply only to genuinely interactive cards. */
+.card-interactive {
+  transition: transform var(--motion-standard) var(--ease-qwizo),
+    box-shadow var(--motion-standard) var(--ease-qwizo),
+    border-color var(--motion-fast) ease;
+}
+.card-interactive:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
+
+/* App page entrance */
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+.page-enter { animation: page-enter var(--motion-emphasis) var(--ease-qwizo); }
+
+/* Reduced motion: complete experience, no non-essential animation */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
+/* ============ Qwizo interaction system (§21) ============ */
+/* One transition recipe for every interactive element. */
+:root {
+  --interact: transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 180ms ease, border-color 180ms ease,
+    box-shadow 180ms ease, color 180ms ease, opacity 180ms ease;
+}
+.interact { transition: var(--interact); }
+
+/* Accessible focus — never remove without replacing. */
+button:focus-visible, a:focus-visible, [role="button"]:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+/* Buttons: unify on the interaction recipe (lift on hover, settle on press). */
+.btn-interactive { transition: var(--interact); }
+.btn-interactive:hover { transform: translateY(-1px); box-shadow: var(--shadow-lift); }
+.btn-interactive:active { transform: translateY(0) scale(0.98); box-shadow: var(--shadow-soft); }
+.btn-arrow { display: inline-block; transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1); }
+.group:hover .btn-arrow { transform: translateX(3px); }
+
+/* Text links with arrow: darker text + arrow nudges 2–4px. */
+.link-arrow { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; transition: var(--interact); }
+.link-arrow:hover { color: var(--color-ink); }
+
+/* Cards: only genuinely interactive cards get this. 1px borders — no layout shift. */
+.card-interactive {
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1), border-color 180ms ease;
+  cursor: pointer;
+}
+.card-interactive:hover { transform: translateY(-2px); border-color: #c9d0d9; box-shadow: var(--shadow-lift); }
+
+/* Icon buttons: transparent → soft neutral → darker + press scale. */
+.icon-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; border-radius: 10px;
+  color: rgba(68, 67, 72, 0.55);
+  transition: var(--interact);
+}
+.icon-btn:hover { background: var(--color-neutral); color: var(--color-ink); }
+.icon-btn:active { background: #e7e9ed; transform: scale(0.96); }
+.icon-btn-danger:hover { background: #fef2f2; color: #b91c1c; }
+.icon-btn-danger:active { background: #fee2e2; }
+
+/* Tooltip: appears after a short delay, fades + slides, never blocks. */
+.has-tooltip { position: relative; display: inline-flex; }
+.tooltip-bubble {
+  position: absolute; bottom: calc(100% + 8px); left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: var(--color-ink); color: #fff;
+  font-size: 12px; font-weight: 500; line-height: 1;
+  padding: 7px 10px; border-radius: 8px; white-space: nowrap;
+  opacity: 0; pointer-events: none; z-index: 50;
+  transition: opacity 150ms ease, transform 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.has-tooltip:hover .tooltip-bubble, .has-tooltip:focus-within .tooltip-bubble {
+  opacity: 1; transform: translateX(-50%) translateY(0);
+  transition-delay: 350ms;
+}
+
+/* Clickable rows: subtle hover background only. Static rows stay static. */
+.row-interactive { transition: background-color 180ms ease; }
+.row-interactive:hover { background: rgba(68, 67, 72, 0.03); }
+
+/* State-swap labels (Copy → Copied, Publish → Publishing…): crossfade, no layout shift. */
+.swap-stack { display: grid; }
+.swap-face { grid-area: 1 / 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: opacity 180ms ease; }
+
+/* Dropdown panel: opacity + scale + rise, 150–200ms. */
+.dropdown-panel {
+  position: absolute; top: calc(100% + 6px); min-width: 190px;
+  background: var(--color-paper); border: 1px solid var(--color-line);
+  border-radius: 14px; box-shadow: var(--shadow-lift); padding: 6px; z-index: 50;
+  animation: dropdown-in 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes dropdown-in {
+  from { opacity: 0; transform: scale(0.98) translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+.dropdown-item {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 9px 12px; border-radius: 9px; font-size: 14px; text-align: left;
+  transition: var(--interact);
+}
+.dropdown-item:hover { background: var(--color-neutral); }
+.nav-menu .dropdown-item:hover { background: rgb(68 67 72 / 0.06); }
+
+/* Progress: fill grows via scaleX — fast, no layout shift. */
+.progress-fill { width: 100%; transform-origin: left; transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1); }
+
+/* ---- Reserved state patterns for the editor / student phases ---- */
+/* Question rows: default / hover / selected (lime indicator) / dragging / disabled. */
+.q-row { transition: var(--interact); border-radius: 10px; }
+.q-row:hover { background: rgba(68, 67, 72, 0.04); }
+.q-row.selected { background: rgba(226, 235, 93, 0.14); box-shadow: inset 3px 0 0 var(--color-lime); }
+.q-row.dragging { background: var(--color-paper); box-shadow: var(--shadow-lift); opacity: 0.96; }
+.q-row.disabled { opacity: 0.45; pointer-events: none; }
+
+/* Answer options: default / hover / selected / correct / incorrect / disabled.
+   Components must also render an icon or text state — never color alone. */
+.opt { transition: var(--interact); border: 1px solid var(--color-line); background: var(--color-paper); border-radius: 10px; }
+.opt:hover { border-color: rgba(68, 67, 72, 0.35); background: #f7f8f9; }
+.opt.selected { border-color: var(--color-lime); background: rgba(226, 235, 93, 0.16); }
+.opt.correct { border-color: #4d7c0f; background: #f0fdf4; }
+.opt.incorrect { border-color: #b91c1c; background: #fef2f2; }
+.opt.disabled { opacity: 0.5; pointer-events: none; }
+
+/* Form controls: hover strengthens border; focus gets the Qwizo ring. */
+.input-qwizo { transition: var(--interact); }
+.input-qwizo:hover { border-color: rgba(68, 67, 72, 0.35); }
+.input-qwizo:focus, select.input-qwizo:focus {
+  outline: none;
+  border-color: rgba(68, 67, 72, 0.55);
+  box-shadow: 0 0 0 3px rgba(226, 235, 93, 0.4);
+}
+select.input-qwizo { transition: var(--interact); }
+select.input-qwizo:hover { border-color: rgba(68, 67, 72, 0.35); }
+
+/* Selectable cards: hover reveals the "selected" dark treatment.
+   Used by the question-type cards on the homepage. */
+.card-selectable {
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 180ms ease, border-color 180ms ease;
+  cursor: pointer;
+}
+.card-selectable h3, .card-selectable p { transition: color 180ms ease; }
+.card-selectable:hover {
+  transform: translateY(-2px);
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  box-shadow: var(--shadow-lift);
+}
+.card-selectable:hover h3 { color: var(--color-paper); }
+.card-selectable:hover p { color: rgba(251, 252, 253, 0.6); }
+
+/* Soft vertical feather: top and bottom edges dissolve into the background.
+   Used by the WHY QWIZO product mockup (no hard frame lines). */
+.melt-y {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 56px, #000 calc(100% - 56px), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 56px, #000 calc(100% - 56px), transparent 100%);
+}
+
+/* Role toggle: sliding lime pill + content crossfade. */
+.toggle-pill { transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes role-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+.role-swap { animation: role-in 300ms cubic-bezier(0.22, 1, 0.36, 1); }
+
+/* Audience switch (Teachers <-> Students): exit, then staggered enter. */
+@keyframes audience-out {
+  to { opacity: 0; transform: translateX(-24px); }
+}
+@keyframes audience-in {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.audience-leaving { animation: audience-out 220ms cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.audience-enter { animation: audience-in 350ms cubic-bezier(0.22, 1, 0.36, 1); }
+.audience-enter .swap-visual { animation: audience-in 350ms cubic-bezier(0.22, 1, 0.36, 1) 120ms backwards; }
+@media (prefers-reduced-motion: reduce) {
+  .audience-leaving, .audience-enter, .audience-enter .swap-visual { animation: none; }
+}
+
+/* Pale lime wash section melting into mist top + bottom — accent presence, site-calm brightness. */
+.lime-wash { background: linear-gradient(to bottom, #e4ecf9 0, #edf1c6 8rem, #edf1c6 calc(100% - 8rem), #e4ecf9 100%); }
