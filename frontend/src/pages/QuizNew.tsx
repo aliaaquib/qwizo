@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/lib/api/client';
 import { PageHead, useToast } from '@/components/shared';
-import { Button } from '@/components/ui';
+import { AsyncButton, Button } from '@/components/ui';
 
 // Phase 5: choice screen + manual creation work.
 // AI generation UI lands in Phase 11.
@@ -39,9 +39,15 @@ export function QuizNew() {
       title: 'Create manually',
       body: 'A blank quiz with the full editor. Add each question yourself, exactly the way you want it.',
       action: (
-        <Button variant="secondary" size="sm" onClick={createManual} disabled={busy}>
-          {busy ? 'Creating…' : 'Blank quiz'}
-        </Button>
+        <AsyncButton
+          variant="secondary"
+          size="sm"
+          onClick={createManual}
+          state={busy ? 'busy' : 'idle'}
+          idle="Blank quiz"
+          busy="Creating…"
+          done="Created"
+        />
       ),
       note: null,
     },
