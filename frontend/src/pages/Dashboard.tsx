@@ -72,9 +72,9 @@ export function Dashboard() {
           {recent.length ? (
             <div className="bg-white border border-gray-100 rounded-xl divide-y divide-gray-50">
               {recent.map(q => (
-                <div key={q.id} className="flex items-center gap-4 px-5 py-4">
+                <div key={q.id} className="row-interactive flex items-center gap-4 px-5 py-4 rounded-xl">
                   <div className="flex-1 min-w-0">
-                    <Link to={`/app/quizzes/${q.id}`} className="font-medium text-[15px] hover:text-accent truncate block">
+                    <Link to={`/app/quizzes/${q.id}`} className="interact font-medium text-[15px] truncate block hover:underline hover:decoration-ink/30 hover:underline-offset-4">
                       {q.title}
                     </Link>
                     <div className="text-xs text-gray-400 mt-0.5">
