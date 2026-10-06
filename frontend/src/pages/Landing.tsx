@@ -1218,7 +1218,7 @@ function Footer() {
   return (
     <footer className="border-t border-line">
       <div className={`${CONTAINER} py-8 flex items-center justify-between`}>
-        <QwizoLogo markSize={28} />
+        <QwizoLogo badge />
         <div className="flex items-center gap-6 text-[14px] text-ink/60">
           <a href="#features" className="hover:text-ink transition-colors">Features</a>
           <a href="#how" className="hover:text-ink transition-colors">How it works</a>
