@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { api } from '@/lib/api/client';
 import { PageHead, useToast } from '@/components/shared';
 import { AsyncButton, Button } from '@/components/ui';
 
-// Phase 5: choice screen + manual creation work.
-// AI generation UI lands in Phase 11.
+// Phase 11: AI generation wired up — prompt mode and upload mode.
 export function QuizNew() {
   const [busy, setBusy] = useState(false);
   const { show, el: toastEl } = useToast();
@@ -26,14 +25,14 @@ export function QuizNew() {
     {
       title: 'Create with AI',
       body: 'Describe the quiz — topic, level, question types — and Qwizo drafts the questions. You review everything before publishing.',
-      action: <Button size="sm" disabled>Start with AI</Button>,
-      note: 'Coming in Phase 11',
+      action: <Link to="/app/quizzes/new/ai"><Button size="sm">Start with AI</Button></Link>,
+      note: null,
     },
     {
       title: 'Create from material',
       body: 'Upload a .txt or .docx handout and generate a quiz grounded in its content. Nothing is invented outside your material.',
-      action: <Button variant="secondary" size="sm" disabled>Upload material</Button>,
-      note: 'Coming in Phase 11',
+      action: <Link to="/app/quizzes/new/ai-upload"><Button variant="secondary" size="sm">Upload material</Button></Link>,
+      note: null,
     },
     {
       title: 'Create manually',
@@ -61,11 +60,11 @@ export function QuizNew() {
       />
       <div className="grid gap-4 md:grid-cols-3">
         {cards.map(c => (
-          <div key={c.title} className="bg-white border border-gray-100 rounded-xl p-6 flex flex-col">
+          <div key={c.title} className="bg-paper border border-line rounded-card p-6 flex flex-col">
             <h4 className="font-bold mb-2">{c.title}</h4>
-            <p className="text-sm text-gray-500 mb-5 flex-1">{c.body}</p>
+            <p className="text-sm text-ink/55 mb-5 flex-1">{c.body}</p>
             {c.action}
-            {c.note && <div className="text-xs text-gray-400 mt-2">{c.note}</div>}
+            {c.note && <div className="text-xs text-ink/40 mt-2">{c.note}</div>}
           </div>
         ))}
       </div>

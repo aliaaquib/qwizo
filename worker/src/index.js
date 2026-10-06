@@ -452,10 +452,13 @@ async function handleBankAddToQuiz(req, env, ctx, params) {
   if (quiz.status === 'published') return err('Unpublish the quiz before editing it.', 409);
   const p = item.payload || {};
   // Copy — editing the quiz question never touches the bank original.
+  // Strip child ids so fresh ones are minted (the payload keeps the source
+  // question's ids, which would collide with its options/pairs rows).
+  const fresh = a => (a || []).map(x => ({ ...x, id: undefined }));
   const q = await ctx.store.createQuestion(quiz.id, {
     type: item.type, text: item.text, explanation: item.explanation, marks: item.marks,
     difficulty: item.difficulty, case_sensitive: !!p.case_sensitive, bank_item_id: item.id,
-    options: p.options, pairs: p.pairs, accepted: p.accepted,
+    options: fresh(p.options), pairs: fresh(p.pairs), accepted: p.accepted,
   });
   return jsonResponse({ question: q }, 201);
 }

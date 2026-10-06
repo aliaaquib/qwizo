@@ -7,8 +7,10 @@ import { Signup } from '@/pages/Signup';
 import { Dashboard } from '@/pages/Dashboard';
 import { QuizList } from '@/pages/QuizList';
 import { QuizNew } from '@/pages/QuizNew';
+import { AiCreate } from '@/pages/AiCreate';
 import { QuizEditor } from '@/pages/QuizEditor';
 import { QuizPreview } from '@/pages/QuizPreview';
+import { ShareQuiz } from '@/pages/ShareQuiz';
 import { QuizResults } from '@/pages/QuizResults';
 import { QuestionBank } from '@/pages/QuestionBank';
 import { Settings } from '@/pages/Settings';
@@ -38,9 +40,12 @@ export const router = createBrowserRouter([
           { index: true, element: <Dashboard /> },
           { path: 'quizzes', element: <QuizList /> },
           { path: 'quizzes/new', element: <QuizNew /> },
+          { path: 'quizzes/new/ai', element: <AiCreate mode="prompt" /> },
+          { path: 'quizzes/new/ai-upload', element: <AiCreate mode="upload" /> },
           { path: 'quizzes/:id', element: <QuizEditor /> },
           { path: 'quizzes/:id/edit', element: <QuizEditor /> },
           { path: 'quizzes/:id/preview', element: <QuizPreview /> },
+          { path: 'quizzes/:id/share', element: <ShareQuiz /> },
           { path: 'quizzes/:id/results', element: <QuizResults /> },
           { path: 'question-bank', element: <QuestionBank /> },
           { path: 'settings', element: <Settings /> },
@@ -48,10 +53,12 @@ export const router = createBrowserRouter([
       },
     ],
   },
-  // Student (public)
+  // Student (public). The share link contract is /q/:code (printed QR codes,
+  // shared links, result bookmarks) — served by the SPA on production.
+  { path: '/join', element: <JoinQuiz /> },
   { path: '/join/:code', element: <JoinQuiz /> },
-  { path: '/quiz/:id', element: <TakeQuiz /> },
-  { path: '/quiz/:id/results', element: <StudentResult /> },
+  { path: '/q/:code', element: <TakeQuiz /> },
+  { path: '/q/:code/r/:token', element: <StudentResult /> },
   // Fallbacks
   { path: '/', element: <Landing /> },
   { path: '*', element: <Navigate to="/" replace /> },

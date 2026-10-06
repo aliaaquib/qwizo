@@ -7,6 +7,10 @@ import tailwindcss from '@tailwindcss/vite';
 // (wrangler dev on :18787) so the React app talks to the real backend.
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  resolve: {
+    // Mirrors tsconfig paths — keeps dev and build resolving identically.
+    alias: { '@': `${import.meta.dirname}/src` },
+  },
   server: {
     port: 5173,
     proxy: {

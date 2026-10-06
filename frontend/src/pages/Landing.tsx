@@ -88,7 +88,6 @@ function NavDropdown({ label, items }: { label: string; items: { label: string; 
 }
 
 function Nav() {
-  const enterCode = () => showStory('students', 'story-join');
   return (
     <div className="absolute top-0 inset-x-0 z-20">
       <div className={`${CONTAINER} pt-5 flex justify-center`}>
@@ -112,13 +111,12 @@ function Nav() {
           </div>
           <div className="flex items-center gap-1">
             <span className="w-px h-5 bg-line ml-6 mr-3 hidden lg:block" aria-hidden="true" />
-            <button
-              type="button"
-              onClick={enterCode}
+            <Link
+              to="/join"
               className="interact hidden lg:block rounded-full bg-ink/5 hover:bg-ink/10 px-4 py-2 text-[15px] font-medium text-ink/75 hover:text-ink"
             >
               Enter code
-            </button>
+            </Link>
             <Link to="/login" className="interact text-[15px] font-medium text-ink/75 hover:text-ink px-3 py-1.5">
               Login
             </Link>

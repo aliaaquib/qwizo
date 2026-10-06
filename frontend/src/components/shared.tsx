@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 // Shared page-level primitives — follow DESIGN_SYSTEM.md.
 
@@ -61,8 +61,12 @@ export function useConfirm() {
     resolve: (v: boolean) => void;
   } | null>(null);
 
-  const confirm = (title: string, message: string, okLabel = 'Confirm') =>
-    new Promise<boolean>(resolve => setPending({ title, message, okLabel, resolve }));
+  // Stable identity for the same reason as useToast's `show`.
+  const confirm = useCallback(
+    (title: string, message: string, okLabel = 'Confirm') =>
+      new Promise<boolean>(resolve => setPending({ title, message, okLabel, resolve })),
+    [],
+  );
 
   const dialog = pending && (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -96,10 +100,13 @@ export function useConfirm() {
 
 export function useToast() {
   const [toast, setToast] = useState<{ msg: string; err: boolean } | null>(null);
-  const show = (msg: string, err = false) => {
+  // Stable identity: pages put `show` in effect/callback deps (e.g. the quiz
+  // editor's loader). A new function every render would refire those effects
+  // in a loop and wipe in-progress edits.
+  const show = useCallback((msg: string, err = false) => {
     setToast({ msg, err });
     setTimeout(() => setToast(null), 3500);
-  };
+  }, []);
   const el = toast && (
     <div
       className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-full text-sm font-medium shadow-lift ${
@@ -110,4 +117,14 @@ export function useToast() {
     </div>
   );
   return { show, el };
+}
+
+export function fmtDate(ts: number | null | undefined): string {
+  if (!ts) return '—';
+  return new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+export function fmtDur(sec: number | null | undefined): string {
+  if (sec == null) return '—';
+  return `${Math.floor(sec / 60)}m ${sec % 60}s`;
 }

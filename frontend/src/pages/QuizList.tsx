@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '@/lib/api/client';
 import type { Quiz } from '@/types';
-import { PageHead, useConfirm, useToast } from '@/components/shared';
+import { PageHead, EmptyState, useConfirm, useToast } from '@/components/shared';
 import { StatusBadge } from '@/pages/Dashboard';
 import { Button, IconButton, Input } from '@/components/ui';
 
@@ -91,11 +91,11 @@ export function QuizList() {
       </div>
 
       {loading ? (
-        <div className="text-sm text-gray-400 py-8 text-center">Loading…</div>
+        <div className="text-sm text-ink/40 py-8 text-center">Loading…</div>
       ) : quizzes.length ? (
-        <div className="bg-white border border-gray-100 rounded-xl divide-y divide-gray-50">
+        <div className="bg-paper border border-line rounded-card divide-y divide-line/60">
           {quizzes.map(quiz => (
-            <div key={quiz.id} className="row-interactive flex items-center gap-4 px-5 py-4 rounded-xl">
+            <div key={quiz.id} className="row-interactive flex items-center gap-4 px-5 py-4 rounded-card">
               <div className="flex-1 min-w-0">
                 <Link
                   to={`/app/quizzes/${quiz.id}`}
@@ -103,7 +103,7 @@ export function QuizList() {
                 >
                   {quiz.title}
                 </Link>
-                <div className="text-xs text-gray-400 mt-0.5">
+                <div className="text-xs text-ink/40 mt-0.5">
                   {quiz.subject || 'No subject'}
                   {quiz.topic ? ` · ${quiz.topic}` : ''} ·{' '}
                   {quiz.question_count ?? 0} questions ·{' '}
@@ -114,7 +114,7 @@ export function QuizList() {
               <div className="flex items-center gap-1">
                 {quiz.status === 'published' && (
                   <>
-                    <Link to={`/app/quizzes/${quiz.id}/preview`} aria-label="Share quiz" className="has-tooltip">
+                    <Link to={`/app/quizzes/${quiz.id}/share`} aria-label="Share quiz" className="has-tooltip">
                       <span className="icon-btn" aria-hidden="true">↗</span>
                       <span className="tooltip-bubble" role="tooltip">Share quiz</span>
                     </Link>
@@ -131,13 +131,11 @@ export function QuizList() {
           ))}
         </div>
       ) : (
-        <div className="bg-white border border-gray-100 rounded-xl p-12 text-center">
-          <h3 className="font-bold mb-1">{q || status ? 'No quizzes match' : 'No quizzes yet'}</h3>
-          <p className="text-sm text-gray-500 mb-4">
-            {q || status ? 'Try a different search or filter.' : 'Create your first quiz — with AI or by hand.'}
-          </p>
-          {!q && !status && <Link to="/app/quizzes/new"><Button>Create quiz</Button></Link>}
-        </div>
+        <EmptyState
+          title={q || status ? 'No quizzes match' : 'No quizzes yet'}
+          body={q || status ? 'Try a different search or filter.' : 'Create your first quiz — with AI or by hand.'}
+          action={!q && !status ? <Link to="/app/quizzes/new"><Button>Create quiz</Button></Link> : undefined}
+        />
       )}
       {dialog}
       {toastEl}
