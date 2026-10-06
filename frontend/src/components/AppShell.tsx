@@ -1,5 +1,6 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthContext';
+import { Logo } from '@/components/Logo';
 import { api } from '@/lib/api/client';
 
 const NAV = [
@@ -14,6 +15,7 @@ const NAV = [
 export function AppShell() {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const logout = async () => {
     await api.logout().catch(() => {});
@@ -24,8 +26,8 @@ export function AppShell() {
   return (
     <div className="min-h-screen bg-neutral flex">
       <aside className="w-60 shrink-0 bg-paper border-r border-line flex flex-col">
-        <div className="px-6 py-6">
-          <span className="text-lg font-semibold tracking-tight">Qwizo</span>
+        <div className="px-6 py-5">
+          <Logo markSize={28} />
         </div>
         <nav className="flex-1 px-3 space-y-1">
           {NAV.map(n => (
@@ -34,7 +36,7 @@ export function AppShell() {
               to={n.to}
               end={n.end}
               className={({ isActive }) =>
-                `block px-4 py-2.5 rounded-control text-[15px] font-medium transition-colors ${
+                `interact block px-4 py-2.5 rounded-control text-[15px] font-medium ${
                   isActive
                     ? 'bg-lime/50 text-ink'
                     : 'text-ink/60 hover:text-ink hover:bg-neutral'
@@ -50,14 +52,14 @@ export function AppShell() {
           <div className="text-[13px] text-ink/50 truncate mb-2">{user?.email}</div>
           <button
             onClick={logout}
-            className="text-[13px] text-ink/60 hover:text-ink font-medium"
+            className="interact text-[13px] text-ink/60 hover:text-ink font-medium"
           >
             Log out
           </button>
         </div>
       </aside>
       <main className="flex-1 min-w-0">
-        <div className="max-w-6xl mx-auto px-8 py-10">
+        <div key={location.pathname} className="page-enter max-w-6xl mx-auto px-8 py-10">
           <Outlet />
         </div>
       </main>
