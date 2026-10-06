@@ -70,35 +70,53 @@ export function QwizoMark({
 /**
  * Canonical Qwizo logo — Arc mark + wordmark lockup.
  * Use `variant="mark"` for compact placements (favicon, app icon, student header).
+ * Use `badge` on light backgrounds where the mark needs its own stage
+ * (e.g. navbar): the Arc sits in a lime rounded badge.
  */
 export function QwizoLogo({
   variant = 'full',
   tone = 'light',
   markSize = 30,
+  badge = false,
+  badgeSize = 38,
   className = '',
 }: {
   variant?: QwizoLogoVariant;
   tone?: QwizoLogoTone;
   /** Height of the Arc mark in px; the wordmark scales with it. */
   markSize?: number;
+  /** Put the mark in a lime badge (light backgrounds). */
+  badge?: boolean;
+  /** Badge box size in px (only when badge is true). */
+  badgeSize?: number;
   className?: string;
 }) {
   const c = toneColors(tone);
+  const wordSize = badge ? 26 : markSize * 0.82;
+  const gap = badge ? 9 : markSize * 0.32;
+  const mark = badge ? (
+    <span className="qwizo-logo-badge" style={{ width: badgeSize, height: badgeSize, borderRadius: badgeSize * 0.28 }}>
+      {/* mono ink mark — the lime arc would vanish on the lime badge */}
+      <QwizoMark size={badgeSize * 0.62} tone="mono-black" label="" />
+    </span>
+  ) : (
+    <QwizoMark size={markSize} tone={tone} />
+  );
   if (variant === 'mark') {
-    return <QwizoMark size={markSize} tone={tone} />;
+    return mark;
   }
   return (
-    <span className={`inline-flex items-center ${className}`} style={{ gap: markSize * 0.32 }}>
-      <QwizoMark size={markSize} tone={tone} />
+    <span className={`qwizo-logo inline-flex items-center ${className}`} style={{ gap }}>
+      {mark}
       <span
         aria-hidden="true"
         style={{
           fontFamily: '"Poppins", "Inter", sans-serif',
           fontWeight: 700,
-          fontSize: markSize * 0.82,
+          fontSize: wordSize,
           letterSpacing: '-0.02em',
           lineHeight: 1,
-          color: c.word,
+          color: badge ? '#0F172A' : c.word,
         }}
       >
         Qwizo

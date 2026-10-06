@@ -94,7 +94,7 @@ function Nav() {
         <Enter y={-14} duration={600}>
         <nav className="bg-paper/95 backdrop-blur border border-line rounded-full shadow-soft pl-5 pr-2 h-14 flex items-center gap-4">
           <Link to="/" aria-label="Qwizo home">
-            <QwizoLogo markSize={32} />
+            <QwizoLogo badge />
           </Link>
           <div className="hidden lg:flex items-center gap-0.5 text-[15px] text-ink/75">
             <NavDropdown label="For educators" items={[
