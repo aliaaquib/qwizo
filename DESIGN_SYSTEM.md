@@ -34,10 +34,15 @@ website, or a boring admin panel.
 Soft blue background. Use for hero backgrounds, large feature sections,
 highlight areas, soft page backgrounds. Never saturated blue.
 
+### Qwizo Mist — `#E4ECF9`
+Pale blue section wash. The "chapter" color between paper sections —
+clearly blue, still light. Never a full saturated fill.
+
 ### Qwizo Lime — `#E2EB5D`
 Signature accent. Use **sparingly**: primary accent elements, small icon
 backgrounds, active states, important highlights, selected controls, key
-CTA accents. Lime feels special because it is NOT everywhere.
+CTA accents. Lime feels special because it is NOT everywhere. Never a full
+section background.
 
 ### Qwizo Ink — `#444348`
 Primary text: headlines, body, primary buttons, navigation, important UI.
@@ -62,6 +67,25 @@ DO: Soft Blue + White + Charcoal + Lime as the primary visual language.
 DON'T: purple gradients, pink, orange, red decorative elements, neon blue,
 multiple accent colors, rainbow gradients, AI sparkle gradients — unless
 required for a functional state (error/warning/success), kept restrained.
+
+### Section Color Rhythm (locked 2026-10-06)
+
+Sections get different colors as *chapters* — one blue family at different
+depths, alternating with paper. Never different hues per section.
+
+1. Hero — sky gradient (airy blue)
+2. Problem — paper page, sky panel
+3. Question types — paper
+4. AI creation — mist wash
+5. Teacher control — paper
+6. Share — neutral gray
+7. Results — paper
+8. Final CTA — ink panel (the one dramatic dark chapter)
+9. Footer — paper
+
+Between sections, melt colors with a top gradient blend
+(`.blend-*` utilities in `index.css`) — no hard cuts. Lime appears only as
+an accent inside sections, never as a section background.
 
 ---
 
@@ -230,3 +254,159 @@ inconsistent typography, no duplicated UI patterns, existing 64 tests green.
 
 Before creating any new UI component, ask: **"Does this look like Qwizo?"**
 If no, redesign it. Consistency beats novelty.
+
+---
+
+## 19. Logo (locked 2026-10-06)
+
+Custom Qwizo mark — never a generic icon or emoji.
+
+- Lime rounded square (`#E2EB5D`, ~11/40 corner radius).
+- Ink (`#444348`) **Q whose tail resolves into a checkmark** — the correct
+  answer. Drawn as SVG (`frontend/src/components/Logo.tsx`, `LogoMark`).
+- Wordmark: "Qwizo", semibold, tight tracking, ink.
+- Favicon: `frontend/public/logo.svg` (same mark).
+- Used in: marketing nav, footer, auth pages (`AuthShell`), app sidebar
+  (`AppShell`). Always the SVG component — never text-only "Qwizo" where the
+  mark belongs.
+
+## 20. Motion System (locked 2026-10-06)
+
+Qwizo feels smooth, fast, responsive, precise, quietly alive. Motion supports
+the interface — it never performs for its own sake.
+
+### Tokens (index.css)
+- Durations: fast `150ms`, standard `250ms`, emphasis `400ms`, reveal `600ms`
+- Easing: `cubic-bezier(0.22, 1, 0.36, 1)` — utility `ease-qwizo`, duration helpers `.t-fast/.t-standard/.t-emphasis/.t-reveal`
+- Animate `opacity` and `transform` only. Never width/height/top/left, large blur, heavy box-shadow, or anything that shifts layout.
+
+### Primitives (components/motion.tsx)
+- `<Enter delay y scaleFrom>` — mount entrance (hero sequence). Fades + rises once.
+- `<Reveal delay y duration>` — scroll reveal via IntersectionObserver, fires once, never replays.
+- `<GrowBar>` pattern — charts/bars grow via `scaleX` with `transform-origin: left` (no layout shift).
+- `usePrefersReducedMotion()` — static end-states when reduced motion is preferred.
+
+### Patterns
+- **Hero entrance:** nav (fade + slide down, 0ms) → eyebrow (100) → headline (200) → description (300) → CTA (400) → product demo (520, translateY 35px→0, scale 0.98→1). Stagger 80–120ms. Nothing appears all at once.
+- **Hero product demo** (ProductDemo.tsx): 14s loop, two believable phases — (1) editor builds: chrome → question → options stagger → correct answer selected → "Saved" pill; (2) AI generation: fields → Generate → "Generating questions…" + progress bar (scaleX) → questions stagger in → "Quiz ready". No sparkles, glows, particles, or spinning icons. It must read as a real tool, not a marketing animation.
+- **Scroll reveal:** opacity 0→1, translateY 24px→0, 600ms, once per element.
+- **Stagger groups** (cards, chips, steps, stats): 60–80ms between items, small movement.
+- **Buttons** (`.btn-interactive` on all Button variants): hover `translateY(-1px)`; press `scale(0.98)`. Arrows: `.btn-arrow` nudges 3px right on group hover.
+- **Nav links:** subtle color/opacity transition only; CTA gets the tiny lift. Never animate the whole nav on link hover.
+- **Cards** (`.card-interactive`, interactive cards only): hover `translateY(-2px)` + shadow-lift. Never `scale(1.05)`, rotation, or dramatic zoom.
+- **App pages:** `.page-enter` on AppShell outlet (keyed by pathname) — 400ms fade + 10px rise.
+
+### Reserved for upcoming phases (editor / student / results)
+- Editor: add question collapsed→expanded; delete fade+collapse→remove; select smooth active-state; save "Saving… → Saved ✓" fast + subtle.
+- Student: question transitions 200–300ms (current translateX(-20px)+fade out, next translateX(20px)+fade in); progress indicator smooth; answer selection instant feedback.
+- Results: score counts quickly (not seconds-long); cards/bars entrance per above.
+
+### Reduced motion
+`@media (prefers-reduced-motion: reduce)` collapses all transitions/animations to ~0ms; JS hooks render final states. Experience stays complete and functional.
+
+### Forbidden
+Excessive parallax, bouncing, spinning cards, rotating buttons, floating everything, huge scale, neon glows, gradient animation, particles, constant background movement, glassmorphism excess, animation on every element, long loaders.
+
+## 21. Interaction System (locked 2026-10-06)
+
+A coherent interaction language, not scattered hover effects. Every interactive
+element feels responsive, smooth, obvious and polished — without the user
+noticing individual effects. Built on the motion tokens (§20): same easing,
+same calm.
+
+### The one recipe (index.css)
+```css
+--interact: transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+  background-color 180ms ease, border-color 180ms ease,
+  box-shadow 180ms ease, color 180ms ease, opacity 180ms ease;
+```
+`.interact` applies it. Never invent a per-component transition.
+
+### Philosophy
+Responsive → smooth → subtle → intentional. Hover = small changes in color,
+border, shadow, or 1–2px movement. Never: exaggerated scale, bounce, rotation,
+glow, gradients, large shadows. Never animate font-size, border-width, width
+or height on hover — transforms, color and shadow only, so layout never jumps.
+
+### Components (components/ui.tsx)
+- **Button** (all variants): hover `translateY(-1px)` + shadow-lift; active
+  `scale(0.98)`; `focus-visible` gets a 2px ink outline (never remove focus
+  without replacing it). Arrows: `.btn-arrow` nudges 3px right on group hover.
+- **AsyncButton**: honest `idle → busy → done` states; labels crossfade in
+  place via `.swap-stack` — the button never resizes mid-transition. Use for
+  Publish (Publish → Publishing… → Published ✓) and similar.
+- **Input/Textarea** (`.input-qwizo`): hover strengthens the border; focus
+  darkens the border + adds the Qwizo ring (`0 0 0 3px rgba(226,235,93,.4)`).
+  No giant glows.
+- **Card** (`interactive` prop): hover `translateY(-2px)`, slightly stronger
+  border + shadow-lift. Only genuinely interactive cards — static info cards
+  stay static.
+- **IconButton**: transparent default → soft neutral hover → darker + `scale(.96)`
+  active. Always paired with a delayed **Tooltip** (350ms delay, fade + slide,
+  `pointer-events: none`) when the icon's purpose isn't obvious.
+- **CopyButton**: Copy → Copied ✓ crossfade, layout-stable.
+- **Dropdown/DropdownItem**: panel animates opacity 0→1, scale .98→1,
+  translateY(-4px)→0 over 180ms. Escape + outside-click close.
+- **ProgressBar**: fill grows via `scaleX` (transform-origin left) — animates
+  instead of jumping, never shifts layout.
+
+### Applied patterns
+- **Nav links** (marketing + app sidebar): subtle color/opacity change only.
+  Active route gets the restrained lime indicator (`bg-lime/50`) — lime marks
+  active/selected states, never whole-button hovers.
+- **Text links**: slightly darker on hover; `.link-arrow` nudges the arrow.
+- **Clickable rows** (`.row-interactive`): subtle hover background. Static rows
+  stay static.
+- **Quiz cards**: hover lift + border transition; overflow/menu controls may
+  become more visible on hover — but stay visible on touch (no hover-only
+  functionality).
+
+### Reserved for the editor / student / results phases
+- **Question rows** (`.q-row`): hover = slight background; `.selected` = lime
+  inset indicator; `.dragging` = elevated + stronger shadow (no rotation);
+  `.disabled` = faded, non-interactive.
+- **Answer options** (`.opt`): hover = clearer border; `.selected` = lime
+  accent; `.correct` = restrained green; `.incorrect` = restrained red.
+  Components must render an icon/text state too — never color alone.
+- **Student**: tap = selected state (never rely on hover on touch); progress
+  animates via ProgressBar; answer feedback is instant.
+- **Tables**: clickable rows get `.row-interactive`; static rows don't.
+
+### Touch + accessibility
+Mobile has no hover: every hover must have a tap/focus/selected equivalent,
+and nothing important hides behind hover. Every interactive element needs
+hover, `focus-visible`, active and disabled states where appropriate.
+
+### What never hovers
+Headings, paragraphs, decorative elements, backgrounds. Not everything needs
+to move — calm is the brand.
+
+## 22. Product story (Teachers / Students)
+
+The landing "Let's find a way" section is an interactive product story, not a
+grid of cards. One segmented switch (Teachers | Students) swaps the entire
+four-card sequence below it — eyebrow, headline, description, points, CTA,
+product visual and stage labels all change together.
+
+- **Stories**: teachers = Create → Edit → Share → Results; students = Join →
+  Answer → Progress → Results. Teacher card 1 (AI creation) is the locked
+  reference — never redesigned, other cards follow its visual language.
+- **Layout rhythm**: cards alternate text→visual / visual→text down the page
+  (same rhythm for both audiences). Mobile always stacks text first, visual
+  second; the switch stays near the top and tappable; no horizontal overflow.
+- **Stage labels**: lime number disc + uppercase stage name + hairline rule
+  (`StageLabel` in `components/product-story.tsx`).
+- **Switch animation** (`index.css`): on change, the current story exits
+  (220ms, fade + slight horizontal slide), then the new story enters (350ms)
+  with product visuals staggered 120ms after text. All in the Qwizo easing
+  (`cubic-bezier(0.22, 1, 0.36, 1)`). No URL change, no page jump; reduced
+  motion swaps instantly with no animation.
+- **Product mockups are live demos**, not pictures: editor (select question,
+  mark answer, Saved indicator, add question), share (copy code/link with
+  Copy→Copied crossfade, QR toggle), results (scaleX bars), join (code+name
+  → joining → joined), quiz (select → next), progress (segmented bar
+  animates on reveal), result (count-up score, expandable review).
+- **Rules**: visuals are always white product surfaces on mist; lime marks
+  active/selected; every interactive element keeps its icon+text state (never
+  color alone); teacher CTAs → /signup; nothing navigates to placeholder
+  routes.
