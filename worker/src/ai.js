@@ -113,6 +113,21 @@ function validateOneQuestion(q, i) {
   return fail(`Question ${n}: unhandled type`);
 }
 
+/**
+ * Pull the generated text out of a Workers AI result.
+ * Chat models return one of two shapes depending on the model:
+ *  - legacy: { response: "<text>" }
+ *  - OpenAI-style: { choices: [{ message: { content: "<text>" } }] }
+ * (Seen live: llama-3.3-70b-instruct-fp8-fast returns the OpenAI shape.)
+ */
+function extractText(res) {
+  if (typeof res === 'string') return res;
+  if (res && typeof res.response === 'string') return res.response;
+  const content = res?.choices?.[0]?.message?.content;
+  if (typeof content === 'string') return content;
+  return JSON.stringify(res ?? null);
+}
+
 function extractJson(text) {
   // Strip markdown fences if the model adds them despite instructions.
   const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -138,7 +153,7 @@ export async function generateQuizQuestions(env, spec) {
         max_tokens: 6000,
         temperature: 0.7,
       });
-      const text = typeof res === 'string' ? res : (res.response || JSON.stringify(res));
+      const text = extractText(res);
       const parsed = extractJson(text);
       if (!parsed) { lastReason = 'AI returned unparsable output'; continue; }
       const v = validateAIQuestions(parsed, spec.types);
@@ -179,7 +194,7 @@ export async function questionAIAction(env, action, question, extra = {}) {
         max_tokens: 2000,
         temperature: 0.7,
       });
-      const text = typeof res === 'string' ? res : (res.response || JSON.stringify(res));
+      const text = extractText(res);
       const parsed = extractJson(text);
       if (!parsed) continue;
       // The model returns a single question object, not {questions:[...]}

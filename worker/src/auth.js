@@ -4,7 +4,9 @@
  * Logout clears the cookie client-side.
  */
 
-const PBKDF2_ITERATIONS = 210000;
+// Cloudflare Workers' WebCrypto caps PBKDF2 at 100,000 iterations
+// (NotSupportedError above that). Do not raise this without a different KDF.
+const PBKDF2_ITERATIONS = 100000;
 const SESSION_DAYS = 7;
 export const COOKIE_NAME = 'qwizo_session';
 

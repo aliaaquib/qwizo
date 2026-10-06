@@ -1,8 +1,9 @@
 import { Link, Navigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
-import { Button, Badge } from '@/components/ui';
+import { Button } from '@/components/ui';
 import { Logo } from '@/components/Logo';
 import { BrandSpot } from '@/components/BrandSpot';
+import { WhyVideo } from '@/components/WhyVideo';
 import { Enter, Reveal, usePrefersReducedMotion } from '@/components/motion';
 import { useAuth } from '@/features/auth/AuthContext';
 import {
@@ -260,11 +261,6 @@ function Hero() {
 // blue panel, centered copy, white browser frame with traffic lights,
 // product UI inside, lime "Play Demo" pill scrolling to the live demo above.
 function Problem() {
-  const questions = [
-    { n: 1, text: 'Solve the equation: 2x = 10', type: 'Multiple choice' },
-    { n: 2, text: 'Graph the line: y = 3x + 1', type: 'Short answer' },
-    { n: 3, text: 'Solve the equation: 3x + 5 = 20', type: 'Multiple choice' },
-  ];
   const points = [
     'AI drafts the questions — you approve every one',
     'Five question types, graded automatically',
@@ -306,56 +302,7 @@ function Problem() {
             </Reveal>
             <Reveal delay={120}>
             <div className="bg-paper rounded-2xl shadow-soft p-2.5 md:p-3">
-              <div className="relative rounded-xl overflow-hidden border border-line">
-                <div className="px-6 md:px-8 py-6 md:py-8">
-                  <div className="flex items-center justify-between mb-6">
-                    <div>
-                      <div className="font-medium text-lg">Linear Equations</div>
-                      <div className="text-[13px] text-ink/50">Mathematics · Year 8 · 15 questions</div>
-                    </div>
-                    <Badge tone="lime">Draft</Badge>
-                  </div>
-                  <div className="space-y-3">
-                    {questions.map((q, i) => (
-                      <div
-                        key={q.n}
-                        className={`rounded-control border px-5 py-4 ${
-                          i === 1 ? 'border-lime bg-lime/15' : 'border-line'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-[13px] text-ink/50">Question {q.n}</span>
-                          <span className="text-[13px] text-ink/50">{q.type}</span>
-                        </div>
-                        <p className="font-medium mt-1">{q.text}</p>
-                        {i === 1 && (
-                          <div className="grid grid-cols-2 gap-2 mt-3">
-                            {['A sketch with slope 3', 'A sketch with slope 1/3'].map(o => (
-                              <div key={o} className="text-[14px] border border-line rounded-control px-3 py-2 bg-paper">
-                                {o}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <a
-                  href="#demo"
-                  className="absolute inset-0 flex items-center justify-center bg-ink/[0.04] hover:bg-ink/[0.08] transition-colors"
-                  aria-label="Play demo — jump to the live product tour"
-                >
-                  <span className="inline-flex items-center gap-2.5 bg-lime rounded-full pl-2 pr-5 py-2 shadow-soft">
-                    <span className="w-9 h-9 rounded-full bg-ink flex items-center justify-center" aria-hidden="true">
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        <path d="M4 2.5v9l7-4.5-7-4.5z" fill="#FBFCFD" />
-                      </svg>
-                    </span>
-                    <span className="font-medium text-[15px]">Play Demo</span>
-                  </span>
-                </a>
-              </div>
+              <WhyVideo />
             </div>
             </Reveal>
           </div>
