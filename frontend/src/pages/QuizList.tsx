@@ -4,7 +4,7 @@ import { api } from '@/lib/api/client';
 import type { Quiz } from '@/types';
 import { PageHead, useConfirm, useToast } from '@/components/shared';
 import { StatusBadge } from '@/pages/Dashboard';
-import { Button, Input } from '@/components/ui';
+import { Button, IconButton, Input } from '@/components/ui';
 
 type QuizRow = Quiz & { question_count?: number; submission_count?: number };
 
@@ -79,7 +79,7 @@ export function QuizList() {
           />
         </div>
         <select
-          className="px-3 py-2.5 text-sm border border-gray-200 rounded-lg outline-none focus:border-accent bg-white"
+          className="input-qwizo px-3 py-2.5 text-sm border border-line rounded-control bg-paper"
           value={status}
           onChange={e => setStatus(e.target.value)}
         >
@@ -95,11 +95,11 @@ export function QuizList() {
       ) : quizzes.length ? (
         <div className="bg-white border border-gray-100 rounded-xl divide-y divide-gray-50">
           {quizzes.map(quiz => (
-            <div key={quiz.id} className="flex items-center gap-4 px-5 py-4">
+            <div key={quiz.id} className="row-interactive flex items-center gap-4 px-5 py-4 rounded-xl">
               <div className="flex-1 min-w-0">
                 <Link
                   to={`/app/quizzes/${quiz.id}`}
-                  className="font-medium text-[15px] hover:text-accent truncate block"
+                  className="interact font-medium text-[15px] truncate block hover:underline hover:decoration-ink/30 hover:underline-offset-4"
                 >
                   {quiz.title}
                 </Link>
@@ -114,36 +114,18 @@ export function QuizList() {
               <div className="flex items-center gap-1">
                 {quiz.status === 'published' && (
                   <>
-                    <Link
-                      to={`/app/quizzes/${quiz.id}/preview`}
-                      title="Share"
-                      className="p-2 text-gray-400 hover:text-ink rounded-lg hover:bg-gray-50"
-                    >
-                      ↗
+                    <Link to={`/app/quizzes/${quiz.id}/preview`} aria-label="Share quiz" className="has-tooltip">
+                      <span className="icon-btn" aria-hidden="true">↗</span>
+                      <span className="tooltip-bubble" role="tooltip">Share quiz</span>
                     </Link>
-                    <Link
-                      to={`/app/quizzes/${quiz.id}/results`}
-                      title="Results"
-                      className="p-2 text-gray-400 hover:text-ink rounded-lg hover:bg-gray-50"
-                    >
-                      ◔
+                    <Link to={`/app/quizzes/${quiz.id}/results`} aria-label="View results" className="has-tooltip">
+                      <span className="icon-btn" aria-hidden="true">◔</span>
+                      <span className="tooltip-bubble" role="tooltip">View results</span>
                     </Link>
                   </>
                 )}
-                <button
-                  title="Duplicate"
-                  onClick={() => duplicate(quiz.id)}
-                  className="p-2 text-gray-400 hover:text-ink rounded-lg hover:bg-gray-50"
-                >
-                  ⧉
-                </button>
-                <button
-                  title="Delete"
-                  onClick={() => del(quiz.id)}
-                  className="p-2 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50"
-                >
-                  ×
-                </button>
+                <IconButton label="Duplicate quiz" onClick={() => duplicate(quiz.id)}>⧉</IconButton>
+                <IconButton label="Delete quiz" danger onClick={() => del(quiz.id)}>×</IconButton>
               </div>
             </div>
           ))}
