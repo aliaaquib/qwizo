@@ -291,17 +291,17 @@ select.input-qwizo:hover { border-color: rgba(68, 67, 72, 0.35); }
 /* Pale lime wash section melting into mist top + bottom — accent presence, site-calm brightness. */
 .lime-wash { background: linear-gradient(to bottom, #e4ecf9 0, #edf1c6 8rem, #edf1c6 calc(100% - 8rem), #e4ecf9 100%); }
 
-/* Qwizo logo badge — lime stage for the Arc mark on light backgrounds. */
+/* Qwizo logo badge — official lime app-icon; hover lifts it subtly. */
 .qwizo-logo-badge {
-  background: #DFF45B;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex: none;
-  transition: background-color 180ms ease, transform 180ms ease;
+  border-radius: 22%;
+  overflow: hidden;
+  transition: transform 180ms ease;
 }
 .qwizo-logo:hover .qwizo-logo-badge {
-  background: #d3e84f;
   transform: translateY(-1px);
 }
 @media (prefers-reduced-motion: reduce) {

@@ -257,47 +257,41 @@ If no, redesign it. Consistency beats novelty.
 
 ---
 
-## 19. Brand Identity — The Arc (locked 2026-10-07)
+## 19. Brand Identity — The Arc (official Brand Kit, 2026-10-07)
 
-The Qwizo brand is the **Arc** — never redesigned, never replaced.
+The Qwizo brand is the **Arc** — never redesigned, never replaced. The
+supplied Qwizo Brand Kit (`frontend/public/brand/`, copied verbatim) is the
+source of truth. Never recreate, redraw, reinterpret, or recolor the assets.
 
-**The mark** (`frontend/src/components/QwizoLogo.tsx`, `QwizoMark`):
-- Lime (`#E2EB5D`) curved arc — thick, round-capped, sweeping bottom-left to top-right.
-- Secondary abstract blade + dot — charcoal (`#444348`) on light, white on dark.
-- Minimal construction, rounded geometry, no extra elements. Never add
-  checkmarks, sparkles, gradients, 3D, shadows, or education symbols.
-- Never rotate, distort, or change the proportions.
+**Official colors** (per Brand Kit README):
+- Qwizo Lime `#DFF45B` · Charcoal `#0F172A` · Sky `#E7F0FF` · White `#FFFFFF`
 
-**The wordmark**: "Qwizo" in Poppins Bold, tight tracking (`-0.02em`),
-always paired with the Arc at a balanced gap. Never a random font.
+**Assets** (`frontend/public/brand/`):
+- `qwizo-logo-light.svg` — primary lockup on light backgrounds
+- `qwizo-logo-dark.svg` — primary lockup on dark backgrounds
+- `qwizo-logo-monochrome.svg` / `qwizo-logo-reverse.svg` — one-color black / white
+- `qwizo-logo-stacked.svg` — compact/stacked placement
+- `qwizo-mark.svg` / `qwizo-mark-dark.svg` — standalone Arc mark
+- `qwizo-mark-monochrome.svg` / `qwizo-mark-reverse.svg` — one-color mark
+- `qwizo-app-icon.svg` — lime badge with ink mark (navbar badge treatment)
+- `favicon.svg` + PNGs (16/32/48/180/512) — browser favicon
 
-**Tones**:
-- `light` — lime arc + charcoal blade/dot/wordmark (light backgrounds)
-- `dark` — lime arc + white blade/dot/wordmark (dark backgrounds)
-- `mono-black` / `mono-white` — entire lockup in one color
+**Wordmark**: bold geometric sans based on Inter (as supplied). For editable
+UI text paired with the badge, use Inter 800.
 
-**Component**: one canonical `<QwizoLogo variant="full"|"mark" tone=... markSize=... />`.
-`variant="mark"` (standalone Arc) for favicon, app icon, compact nav,
-student quiz header, loading states. Sizing via `markSize` only — never
-manual sizes; aspect ratio always preserved. Generous clear space always.
+**Component**: `<QwizoLogo variant="full"|"mark" tone="light"|"dark"|"mono-black"|"mono-white" markSize=... badge=... />`
+renders the official SVGs via `<img>` — no hand-drawn paths. `badge` renders
+the official lime app-icon at 38px + "Qwizo" in Inter 800 `#0F172A` (navbar).
 
-**Favicon**: `frontend/public/favicon.svg` (+ PNGs 16/32/48/180/512) —
-standalone Arc mark only, never the wordmark.
+**Usage**: marketing nav (badge) / footer, auth pages, app sidebar, teacher
+dashboard, editor, bank, share, results, settings, student header (mark only).
+One brand everywhere.
 
-**Brand assets**: `frontend/brand/` — `qwizo-logo.svg`, `qwizo-logo-dark.svg`,
-`qwizo-logo-monochrome.svg`, `qwizo-logo-reverse.svg`, `qwizo-mark.svg`,
-`qwizo-mark-dark.svg`, `favicon.svg`. Wordmark stored as vector paths
-(Poppins Bold outlines).
+**Motion**: the mark itself stays still. Navbar badge lifts 1px on hover;
+no rotation, bouncing, morphing, or glow.
 
-**Usage**: marketing nav/footer, auth pages, app sidebar, teacher dashboard,
-editor, bank, share, results, settings, student header (mark only, subtle).
-One brand everywhere — never a separate marketing vs app logo.
-
-**Motion**: the mark itself stays still. A subtle entrance (fade + scale) is
-acceptable on the marketing page; no rotation, bouncing, morphing, or glow.
-
-**Source of truth**: the approved reference (lime arc + blade + dot +
-"Qwizo" wordmark). For any new surface, use this identity — do not invent
+**Never**: redesign, rotate, stretch, recolor, or add effects (gradients,
+shadows, 3D, glow, sparkles) to the approved Arc.
 another logo.
 
 ## 20. Motion System (locked 2026-10-06)

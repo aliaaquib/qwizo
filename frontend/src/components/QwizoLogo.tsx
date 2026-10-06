@@ -1,78 +1,56 @@
-// Qwizo official brand identity — the Arc.
-// Single source of truth for the Qwizo logo. Do not create alternative marks.
-//
-// The mark: lime arc + secondary abstract blade + dot.
-// Tones:
-//   light      — lime arc, charcoal blade/dot, charcoal wordmark (light backgrounds)
-//   dark       — lime arc, white blade/dot, white wordmark (dark backgrounds)
-//   mono-black — entire mark + wordmark in charcoal
-//   mono-white — entire mark + wordmark in white
+/**
+ * Canonical Qwizo logo — renders the OFFICIAL brand-kit SVG assets directly.
+ *
+ * Source of truth: `frontend/public/brand/` (copied verbatim from the
+ * supplied Qwizo Brand Kit). Never recreate, redraw, or reinterpret the Arc.
+ *
+ * - `variant="full"` — Arc + Qwizo wordmark lockup
+ * - `variant="mark"` — standalone Arc mark
+ * - `tone="light"` — for light backgrounds
+ * - `tone="dark"` — for dark backgrounds
+ * - `tone="mono-black"` / `tone="mono-white"` — one-color versions
+ * - `badge` — official lime app-icon badge + Qwizo wordmark (navbar treatment)
+ */
 
-export const QWIZO_LIME = '#E2EB5D';
-export const QWIZO_INK = '#444348';
-
-export type QwizoLogoTone = 'light' | 'dark' | 'mono-black' | 'mono-white';
 export type QwizoLogoVariant = 'full' | 'mark';
+export type QwizoLogoTone = 'light' | 'dark' | 'mono-black' | 'mono-white';
 
-function toneColors(tone: QwizoLogoTone): { arc: string; secondary: string; word: string } {
-  switch (tone) {
-    case 'dark':
-      return { arc: QWIZO_LIME, secondary: '#FFFFFF', word: '#FFFFFF' };
-    case 'mono-black':
-      return { arc: QWIZO_INK, secondary: QWIZO_INK, word: QWIZO_INK };
-    case 'mono-white':
-      return { arc: '#FFFFFF', secondary: '#FFFFFF', word: '#FFFFFF' };
-    case 'light':
-    default:
-      return { arc: QWIZO_LIME, secondary: QWIZO_INK, word: QWIZO_INK };
-  }
-}
+const FULL_SRC: Record<QwizoLogoTone, string> = {
+  light: '/brand/qwizo-logo-light.svg',
+  dark: '/brand/qwizo-logo-dark.svg',
+  'mono-black': '/brand/qwizo-logo-monochrome.svg',
+  'mono-white': '/brand/qwizo-logo-reverse.svg',
+};
 
-/** Standalone Arc mark. */
+const MARK_SRC: Record<QwizoLogoTone, string> = {
+  light: '/brand/qwizo-mark.svg',
+  dark: '/brand/qwizo-mark-dark.svg',
+  'mono-black': '/brand/qwizo-mark-monochrome.svg',
+  'mono-white': '/brand/qwizo-mark-reverse.svg',
+};
+
+/** Standalone Arc mark — official asset, never redrawn. */
 export function QwizoMark({
   size = 32,
   tone = 'light',
-  label = 'Qwizo logo',
+  label = 'Qwizo',
 }: {
   size?: number;
   tone?: QwizoLogoTone;
   label?: string;
 }) {
-  const c = toneColors(tone);
-  // viewBox 200x170 — intrinsic aspect ratio of the mark
   return (
-    <svg
-      width={size * (200 / 170)}
+    <img
+      src={MARK_SRC[tone]}
+      alt={label}
+      width={size}
       height={size}
-      viewBox="0 0 200 170"
-      fill="none"
-      role="img"
-      aria-label={label}
-    >
-      {/* lime arc */}
-      <path
-        d="M38 128 C56 86 94 60 134 56"
-        stroke={c.arc}
-        strokeWidth="31"
-        strokeLinecap="round"
-      />
-      {/* secondary blade */}
-      <path
-        d="M92 88 C108 86 124 92 132 104 C138 114 138 128 134 140 C132 146 124 148 117 145 C105 140 94 130 89 118 C85 108 86 96 92 88 Z"
-        fill={c.secondary}
-      />
-      {/* dot */}
-      <circle cx="154" cy="78" r="14" fill={c.secondary} />
-    </svg>
+      style={{ display: 'block', flex: 'none' }}
+      draggable={false}
+    />
   );
 }
 
-/**
- * Canonical Qwizo logo — Arc mark + wordmark lockup.
- * Use `variant="mark"` for compact placements (favicon, app icon, student header).
- * Use `badge` on light backgrounds where the mark needs its own stage
- * (e.g. navbar): the Arc sits in a lime rounded badge.
- */
 export function QwizoLogo({
   variant = 'full',
   tone = 'light',
@@ -83,44 +61,57 @@ export function QwizoLogo({
 }: {
   variant?: QwizoLogoVariant;
   tone?: QwizoLogoTone;
-  /** Height of the Arc mark in px; the wordmark scales with it. */
+  /** Rendered height in px (aspect ratio preserved by the SVG). */
   markSize?: number;
-  /** Put the mark in a lime badge (light backgrounds). */
+  /** Navbar treatment: official lime app-icon badge + Qwizo wordmark. */
   badge?: boolean;
-  /** Badge box size in px (only when badge is true). */
+  /** Badge size in px (only when badge is true). */
   badgeSize?: number;
   className?: string;
 }) {
-  const c = toneColors(tone);
-  const wordSize = badge ? 26 : markSize * 0.82;
-  const gap = badge ? 9 : markSize * 0.32;
-  const mark = badge ? (
-    <span className="qwizo-logo-badge" style={{ width: badgeSize, height: badgeSize, borderRadius: badgeSize * 0.28 }}>
-      {/* mono ink mark — the lime arc would vanish on the lime badge */}
-      <QwizoMark size={badgeSize * 0.62} tone="mono-black" label="" />
-    </span>
-  ) : (
-    <QwizoMark size={markSize} tone={tone} />
-  );
-  if (variant === 'mark') {
-    return mark;
-  }
-  return (
-    <span className={`qwizo-logo inline-flex items-center ${className}`} style={{ gap }}>
-      {mark}
-      <span
-        aria-hidden="true"
-        style={{
-          fontFamily: '"Poppins", "Inter", sans-serif',
-          fontWeight: 700,
-          fontSize: wordSize,
-          letterSpacing: '-0.02em',
-          lineHeight: 1,
-          color: badge ? '#0F172A' : c.word,
-        }}
-      >
-        Qwizo
+  if (badge) {
+    return (
+      <span className={`qwizo-logo inline-flex items-center ${className}`} style={{ gap: 9 }}>
+        <span className="qwizo-logo-badge" style={{ width: badgeSize, height: badgeSize }}>
+          <img
+            src="/brand/qwizo-app-icon.svg"
+            alt=""
+            width={badgeSize}
+            height={badgeSize}
+            style={{ display: 'block', width: '100%', height: '100%' }}
+            draggable={false}
+          />
+        </span>
+        <span
+          aria-hidden="true"
+          style={{
+            fontFamily: '"Inter", sans-serif',
+            fontWeight: 800,
+            fontSize: 26,
+            letterSpacing: '-0.02em',
+            lineHeight: 1,
+            color: '#0F172A',
+          }}
+        >
+          Qwizo
+        </span>
       </span>
-    </span>
+    );
+  }
+  if (variant === 'mark') {
+    return <QwizoMark size={markSize} tone={tone} />;
+  }
+  // Official lockup is 560x150; set both dimensions so the aspect holds.
+  const w = Math.round((markSize * 560) / 150);
+  return (
+    <img
+      src={FULL_SRC[tone]}
+      alt="Qwizo"
+      width={w}
+      height={markSize}
+      className={className}
+      style={{ display: 'block', flex: 'none' }}
+      draggable={false}
+    />
   );
 }
