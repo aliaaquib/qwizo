@@ -1,7 +1,7 @@
 import { Link, Navigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui';
-import { Logo } from '@/components/Logo';
+import { QwizoLogo } from '@/components/QwizoLogo';
 import { BrandSpot } from '@/components/BrandSpot';
 import { WhyVideo } from '@/components/WhyVideo';
 import { Enter, Reveal, usePrefersReducedMotion } from '@/components/motion';
@@ -94,7 +94,7 @@ function Nav() {
         <Enter y={-14} duration={600}>
         <nav className="bg-paper/95 backdrop-blur border border-line rounded-full shadow-soft pl-5 pr-2 h-14 flex items-center gap-4">
           <Link to="/" aria-label="Qwizo home">
-            <Logo markSize={28} />
+            <QwizoLogo markSize={32} />
           </Link>
           <div className="hidden lg:flex items-center gap-0.5 text-[15px] text-ink/75">
             <NavDropdown label="For educators" items={[
@@ -1218,7 +1218,7 @@ function Footer() {
   return (
     <footer className="border-t border-line">
       <div className={`${CONTAINER} py-8 flex items-center justify-between`}>
-        <Logo markSize={26} />
+        <QwizoLogo markSize={28} />
         <div className="flex items-center gap-6 text-[14px] text-ink/60">
           <a href="#features" className="hover:text-ink transition-colors">Features</a>
           <a href="#how" className="hover:text-ink transition-colors">How it works</a>

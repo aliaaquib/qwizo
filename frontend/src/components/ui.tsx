@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from 'react';
-import { Logo } from '@/components/Logo';
+import { QwizoLogo } from '@/components/QwizoLogo';
 
 // Qwizo UI primitives — follow DESIGN_SYSTEM.md.
 // Primary: charcoal bg + white text. Secondary: white + border.
@@ -132,7 +132,7 @@ export function AuthShell({
     <div className="min-h-screen bg-sky/40 flex items-center justify-center px-4">
       <div className="w-full max-w-[420px]">
         <div className="flex justify-center mb-8">
-          <Logo />
+          <QwizoLogo />
         </div>
         <Card className="p-8">
           <h1 className="text-2xl font-medium tracking-tight mb-1.5">{title}</h1>

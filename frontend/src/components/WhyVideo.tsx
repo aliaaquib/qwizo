@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { LogoMark } from '@/components/Logo';
+import { QwizoMark } from '@/components/QwizoLogo';
 import { usePrefersReducedMotion, useRevealOnce } from '@/components/motion';
 
 // Why Qwizo — 18-second looping product story for the Why Qwizo video card.
@@ -321,7 +321,7 @@ function ResultsScene({ t, static: isStatic = false }: { t: number; static?: boo
       {outroE > 0 && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-paper" style={{ opacity: outroE }}>
           <div style={{ transform: `scale(${0.85 + 0.15 * outroE})` }}>
-            <LogoMark size={64} />
+            <QwizoMark size={64} tone="light" />
           </div>
           <div className="display text-2xl md:text-3xl">Start creating free.</div>
         </div>

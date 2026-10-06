@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Logo } from '@/components/Logo';
+import { QwizoLogo } from '@/components/QwizoLogo';
 import { Button, Card, Input } from '@/components/ui';
 import { useToast } from '@/components/shared';
 
@@ -26,7 +26,7 @@ export function JoinQuiz() {
     <div className="min-h-screen bg-paper flex flex-col">
       <header className="py-5">
         <div className="max-w-[1200px] mx-auto px-6">
-          <Link to="/" aria-label="Qwizo home"><Logo markSize={30} /></Link>
+          <Link to="/" aria-label="Qwizo home"><QwizoLogo markSize={30} /></Link>
         </div>
       </header>
       <main className="flex-1 flex items-center justify-center px-6 pb-16">

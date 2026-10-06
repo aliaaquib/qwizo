@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '@/lib/api/client';
 import type { PublicQuestion, PublicQuiz, StudentAnswer, StudentResultData } from '@/types';
 import { Button, Card, Input, ProgressBar } from '@/components/ui';
-import { Logo } from '@/components/Logo';
+import { QwizoLogo } from '@/components/QwizoLogo';
 import { useConfirm } from '@/components/shared';
 import { StudentResultView, StudentShell } from './StudentResult';
 
@@ -363,7 +363,7 @@ export function TakeQuiz() {
       <div className="min-h-screen bg-paper flex flex-col">
         <header className="py-4 border-b border-line/60 sticky top-0 bg-paper/95 backdrop-blur z-10">
           <div className="max-w-[720px] mx-auto px-6 flex items-center gap-4">
-            <Logo markSize={22} />
+            <QwizoLogo variant="mark" markSize={22} />
             <div className="flex-1"><ProgressBar value={index + 1} max={total} /></div>
             <span className="text-[13px] font-medium text-ink/50 whitespace-nowrap">{index + 1} / {total}</span>
             {timeLeft != null && (

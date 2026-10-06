@@ -1,6 +1,6 @@
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthContext';
-import { Logo } from '@/components/Logo';
+import { QwizoLogo } from '@/components/QwizoLogo';
 import { api } from '@/lib/api/client';
 
 const NAV = [
@@ -27,7 +27,7 @@ export function AppShell() {
     <div className="min-h-screen bg-neutral flex">
       <aside className="w-60 shrink-0 bg-paper border-r border-line flex flex-col">
         <div className="px-6 py-5">
-          <Logo markSize={28} />
+          <QwizoLogo markSize={28} />
         </div>
         <nav className="flex-1 px-3 space-y-1">
           {NAV.map(n => (

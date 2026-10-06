@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { LogoMark } from '@/components/Logo';
+import { QwizoMark } from '@/components/QwizoLogo';
 import { usePrefersReducedMotion } from '@/components/motion';
 
 // Qwizo brand spot — the original 12-second looping brand motion piece.
@@ -17,25 +17,12 @@ const easeOut = (x: number) => 1 - Math.pow(1 - x, 3);
 
 const TAGLINE = ['Create', 'better', 'quizzes.', 'in', 'minutes,', 'not', 'hours.'];
 
-/** Logo mark with the Q bowl + check drawing themselves. */
-function DrawnLogo({ size = 76, drawE, checkE }: { size?: number; drawE: number; checkE: number }) {
+/** Arc mark with a subtle entrance (scale + fade). The mark itself stays still. */
+function ArcIntro({ size = 76, e }: { size?: number; e: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" aria-hidden="true">
-      <rect width="40" height="40" rx="11" fill="#E2EB5D" />
-      <circle
-        cx="18" cy="18" r="9"
-        stroke="#444348" strokeWidth="4" strokeLinecap="round"
-        pathLength={100} strokeDasharray={100}
-        strokeDashoffset={100 * (1 - drawE)}
-        transform="rotate(-90 18 18)"
-      />
-      <path
-        d="M23.5 23.5 L27.5 27.5 L33.5 19.5"
-        stroke="#444348" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"
-        pathLength={100} strokeDasharray={100}
-        strokeDashoffset={100 * (1 - checkE)}
-      />
-    </svg>
+    <div style={{ opacity: Math.max(e, 0.15), transform: `scale(${0.92 + 0.08 * e})` }}>
+      <QwizoMark size={size} tone="light" />
+    </div>
   );
 }
 
@@ -69,9 +56,8 @@ export function BrandSpot() {
   const b3 = seg(t, 6000, 6250) * (1 - seg(t, 8600, 9000));
   const b4 = seg(t, 9000, 9250) * (1 - seg(t, 11600, 12000));
 
-  // Beat 1: logo draws, wordmark rises
+  // Beat 1: logo entrance, wordmark rises
   const drawE = easeOut(seg(t, 300, 1300));
-  const checkE = easeOut(seg(t, 1100, 1650));
   const wordE = easeOut(seg(t, 1250, 1850));
 
   // Beat 2: tagline word by word
@@ -94,8 +80,8 @@ export function BrandSpot() {
         role="img"
         aria-label="Qwizo — create better quizzes in minutes, not hours"
       >
-        <LogoMark size={76} />
-        <div className="display text-4xl text-ink">Qwizo</div>
+        <QwizoMark size={76} tone="light" />
+        <div className="text-4xl text-ink" style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700 }}>Qwizo</div>
         <div className="bg-ink text-white rounded-full px-7 py-3 text-[15px] font-medium">
           Start creating free
         </div>
@@ -112,11 +98,9 @@ export function BrandSpot() {
     >
       {/* Beat 1 — lime opener */}
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-5" style={{ opacity: b1, background: '#E2EB5D' }}>
-        <div style={{ opacity: Math.max(drawE, 0.15), transform: `scale(${0.92 + 0.08 * drawE})` }}>
-          <DrawnLogo drawE={drawE} checkE={checkE} />
-        </div>
+        <ArcIntro e={drawE} />
         <Rise e={wordE}>
-          <div className="display text-4xl text-ink">Qwizo</div>
+          <div className="text-4xl text-ink" style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 700, letterSpacing: '-0.02em' }}>Qwizo</div>
         </Rise>
       </div>
 
@@ -169,7 +153,7 @@ export function BrandSpot() {
       {/* Beat 4 — lime outro */}
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-5" style={{ opacity: b4, background: '#E2EB5D' }}>
         <div style={{ opacity: outroLogoE, transform: `scale(${0.9 + 0.1 * outroLogoE})` }}>
-          <LogoMark size={76} />
+          <QwizoMark size={76} tone="light" />
         </div>
         <Rise e={outroCtaE}>
           <div className="bg-ink text-white rounded-full px-7 py-3 text-[15px] font-medium">

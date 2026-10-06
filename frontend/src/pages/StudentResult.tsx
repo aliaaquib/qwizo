@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { api } from '@/lib/api/client';
 import type { ReviewItem, StudentResultData } from '@/types';
-import { Logo } from '@/components/Logo';
+import { QwizoLogo } from '@/components/QwizoLogo';
 import { Card } from '@/components/ui';
 
 // Phase 9 — Student result review. Rendered after submit (via location state)
@@ -14,7 +14,7 @@ export function StudentShell({ children }: { children: React.ReactNode }) {
       <header className="py-5 border-b border-line/60">
         <div className="max-w-[720px] mx-auto px-6">
           <Link to="/" aria-label="Qwizo home" className="inline-flex items-center gap-2">
-            <Logo markSize={24} />
+            <QwizoLogo variant="mark" markSize={24} />
           </Link>
         </div>
       </header>

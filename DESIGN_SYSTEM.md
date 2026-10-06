@@ -257,18 +257,48 @@ If no, redesign it. Consistency beats novelty.
 
 ---
 
-## 19. Logo (locked 2026-10-06)
+## 19. Brand Identity — The Arc (locked 2026-10-07)
 
-Custom Qwizo mark — never a generic icon or emoji.
+The Qwizo brand is the **Arc** — never redesigned, never replaced.
 
-- Lime rounded square (`#E2EB5D`, ~11/40 corner radius).
-- Ink (`#444348`) **Q whose tail resolves into a checkmark** — the correct
-  answer. Drawn as SVG (`frontend/src/components/Logo.tsx`, `LogoMark`).
-- Wordmark: "Qwizo", semibold, tight tracking, ink.
-- Favicon: `frontend/public/logo.svg` (same mark).
-- Used in: marketing nav, footer, auth pages (`AuthShell`), app sidebar
-  (`AppShell`). Always the SVG component — never text-only "Qwizo" where the
-  mark belongs.
+**The mark** (`frontend/src/components/QwizoLogo.tsx`, `QwizoMark`):
+- Lime (`#E2EB5D`) curved arc — thick, round-capped, sweeping bottom-left to top-right.
+- Secondary abstract blade + dot — charcoal (`#444348`) on light, white on dark.
+- Minimal construction, rounded geometry, no extra elements. Never add
+  checkmarks, sparkles, gradients, 3D, shadows, or education symbols.
+- Never rotate, distort, or change the proportions.
+
+**The wordmark**: "Qwizo" in Poppins Bold, tight tracking (`-0.02em`),
+always paired with the Arc at a balanced gap. Never a random font.
+
+**Tones**:
+- `light` — lime arc + charcoal blade/dot/wordmark (light backgrounds)
+- `dark` — lime arc + white blade/dot/wordmark (dark backgrounds)
+- `mono-black` / `mono-white` — entire lockup in one color
+
+**Component**: one canonical `<QwizoLogo variant="full"|"mark" tone=... markSize=... />`.
+`variant="mark"` (standalone Arc) for favicon, app icon, compact nav,
+student quiz header, loading states. Sizing via `markSize` only — never
+manual sizes; aspect ratio always preserved. Generous clear space always.
+
+**Favicon**: `frontend/public/favicon.svg` (+ PNGs 16/32/48/180/512) —
+standalone Arc mark only, never the wordmark.
+
+**Brand assets**: `frontend/brand/` — `qwizo-logo.svg`, `qwizo-logo-dark.svg`,
+`qwizo-logo-monochrome.svg`, `qwizo-logo-reverse.svg`, `qwizo-mark.svg`,
+`qwizo-mark-dark.svg`, `favicon.svg`. Wordmark stored as vector paths
+(Poppins Bold outlines).
+
+**Usage**: marketing nav/footer, auth pages, app sidebar, teacher dashboard,
+editor, bank, share, results, settings, student header (mark only, subtle).
+One brand everywhere — never a separate marketing vs app logo.
+
+**Motion**: the mark itself stays still. A subtle entrance (fade + scale) is
+acceptable on the marketing page; no rotation, bouncing, morphing, or glow.
+
+**Source of truth**: the approved reference (lime arc + blade + dot +
+"Qwizo" wordmark). For any new surface, use this identity — do not invent
+another logo.
 
 ## 20. Motion System (locked 2026-10-06)
 
