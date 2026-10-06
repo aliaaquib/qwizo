@@ -12,8 +12,5 @@
       "destination": "/index.html",
       "source": "/(.*)"
     }
-  ],
-  "git": {
-    "deploymentEnabled": false
-  }
+  ]
 }
