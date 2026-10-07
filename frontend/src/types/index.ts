@@ -97,6 +97,8 @@ export interface BankItem {
 
 export interface Submission {
   id: string;
+  quiz_id?: string;
+  quiz_title?: string;
   student_name: string;
   score: number;
   max_score: number;

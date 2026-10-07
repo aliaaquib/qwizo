@@ -166,6 +166,8 @@ export const api = {
       `/api/quizzes/${quizId}/results/summary`),
   listSubmissions: (quizId: string) =>
     request<{ submissions: Submission[] }>(`/api/quizzes/${quizId}/submissions`),
+  listAllSubmissions: () =>
+    request<{ submissions: Submission[] }>(`/api/reports/submissions`),
   getSubmission: (subId: string) =>
     request<{ submission: SubmissionDetail; quiz: { id: string; title: string } }>(
       `/api/submissions/${subId}`),

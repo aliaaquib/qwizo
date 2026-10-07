@@ -488,6 +488,16 @@ export class TeacherStore {
     ).toArray().map(s => ({ ...s, late: !!s.late }));
   }
 
+  /** All submissions across the teacher's quizzes, newest first. */
+  listAllSubmissions(limit = 200) {
+    return this.sql.exec(
+      `SELECT s.id, s.quiz_id, s.student_name, s.score, s.max_score, s.percentage,
+              s.correct_count, s.incorrect_count, s.submitted_at, q.title AS quiz_title
+       FROM submissions s JOIN quizzes q ON q.id = s.quiz_id
+       ORDER BY s.submitted_at DESC LIMIT ?`, limit
+    ).toArray();
+  }
+
   resultsSummary(quizId) {
     const subs = this.sql.exec('SELECT id, percentage FROM submissions WHERE quiz_id = ?', quizId).toArray();
     const avg = subs.length ? subs.reduce((a, s) => a + s.percentage, 0) / subs.length : 0;

@@ -701,6 +701,11 @@ async function handleListSubmissions(req, env, ctx, params) {
   return jsonResponse({ submissions: await ctx.store.listSubmissions(params.id) });
 }
 
+/** All submissions across the teacher's quizzes (for Reports/Students). */
+async function handleListAllSubmissions(req, env, ctx) {
+  return jsonResponse({ submissions: await ctx.store.listAllSubmissions() });
+}
+
 async function handleGetSubmission(req, env, ctx, params) {
   const s = await ctx.store.getSubmission(params.sid);
   if (!s) return err('Submission not found', 404);
@@ -905,6 +910,7 @@ const ROUTES = [
   // results
   ['GET', /^\/api\/quizzes\/([^/]+)\/results\/summary$/, handleResultsSummary, true, 'id'],
   ['GET', /^\/api\/quizzes\/([^/]+)\/submissions$/, handleListSubmissions, true, 'id'],
+  ['GET', /^\/api\/reports\/submissions$/, handleListAllSubmissions, true],
   ['GET', /^\/api\/submissions\/([^/]+)$/, handleGetSubmission, true, 'sid'],
   // public student
   ['GET', /^\/api\/public\/quiz\/([^/]+)$/, handlePublicQuiz, false, 'code'],

@@ -15,6 +15,9 @@ import { QuizResults } from '@/pages/QuizResults';
 import { QuestionBank } from '@/pages/QuestionBank';
 import { Templates } from '@/pages/Templates';
 import { Onboarding } from '@/pages/Onboarding';
+import { Reports } from '@/pages/Reports';
+import { Students } from '@/pages/Students';
+import { Playground } from '@/pages/Playground';
 import { Settings } from '@/pages/Settings';
 import { JoinQuiz } from '@/pages/JoinQuiz';
 import { TakeQuiz } from '@/pages/TakeQuiz';
@@ -54,6 +57,9 @@ export const router = createBrowserRouter([
           { path: 'quizzes/:id/results', element: <QuizResults /> },
           { path: 'question-bank', element: <QuestionBank /> },
           { path: 'templates', element: <Templates /> },
+          { path: 'reports', element: <Reports /> },
+          { path: 'students', element: <Students /> },
+          { path: 'playground', element: <Playground /> },
           { path: 'settings', element: <Settings /> },
         ],
       },
