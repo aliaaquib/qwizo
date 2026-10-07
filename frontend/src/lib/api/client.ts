@@ -48,9 +48,9 @@ export const api = {
     }),
   logout: () => request<{ ok: true }>('/api/auth/logout', { method: 'POST' }),
   me: () => request<{ user: Teacher }>('/api/auth/me'),
-  saveOnboarding: (role: string) =>
+  saveOnboarding: (body: { role: string; job_title?: string; specialization?: string; subjects?: string[]; grades?: string[] }) =>
     request<{ user: Teacher }>('/api/auth/onboarding', {
-      method: 'POST', body: JSON.stringify({ role }),
+      method: 'POST', body: JSON.stringify(body),
     }),
   updateMe: (name: string) =>
     request<{ user: Teacher }>('/api/auth/me', {

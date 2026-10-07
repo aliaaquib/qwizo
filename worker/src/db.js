@@ -140,6 +140,10 @@ export class TeacherStore {
     for (const [table, col, def] of [
       ['user', 'role', `TEXT NOT NULL DEFAULT ''`],
       ['user', 'onboarding_done', 'INTEGER NOT NULL DEFAULT 0'],
+      ['user', 'job_title', `TEXT NOT NULL DEFAULT ''`],
+      ['user', 'specialization', `TEXT NOT NULL DEFAULT ''`],
+      ['user', 'subjects', `TEXT NOT NULL DEFAULT '[]'`],
+      ['user', 'grades', `TEXT NOT NULL DEFAULT '[]'`],
     ]) {
       try {
         this.sql.exec(`ALTER TABLE ${table} ADD COLUMN ${col} ${def}`);
@@ -182,14 +186,18 @@ export class TeacherStore {
   }
 
   getUser(id) {
-    return this._one('SELECT id, name, email, password_hash, role, onboarding_done, created_at FROM user WHERE id = ?', id);
+    return this._one('SELECT id, name, email, password_hash, role, job_title, specialization, subjects, grades, onboarding_done, created_at FROM user WHERE id = ?', id);
   }
 
-  updateUser(id, { name, role, onboarding_done }) {
+  updateUser(id, { name, role, job_title, specialization, subjects, grades, onboarding_done }) {
     const sets = [];
     const args = [];
     if (name !== undefined) { sets.push('name = ?'); args.push(name); }
     if (role !== undefined) { sets.push('role = ?'); args.push(String(role).slice(0, 50)); }
+    if (job_title !== undefined) { sets.push('job_title = ?'); args.push(String(job_title).slice(0, 80)); }
+    if (specialization !== undefined) { sets.push('specialization = ?'); args.push(String(specialization).slice(0, 80)); }
+    if (subjects !== undefined) { sets.push('subjects = ?'); args.push(JSON.stringify(subjects).slice(0, 2000)); }
+    if (grades !== undefined) { sets.push('grades = ?'); args.push(JSON.stringify(grades).slice(0, 1000)); }
     if (onboarding_done !== undefined) { sets.push('onboarding_done = ?'); args.push(onboarding_done ? 1 : 0); }
     if (sets.length) this.sql.exec(`UPDATE user SET ${sets.join(', ')} WHERE id = ?`, ...args, id);
     return this.getUser(id);

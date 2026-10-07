@@ -10,6 +10,10 @@ export interface Teacher {
   name: string;
   email: string;
   role?: string;
+  job_title?: string;
+  specialization?: string;
+  subjects?: string[];
+  grades?: string[];
   onboarding_done?: boolean;
 }
 

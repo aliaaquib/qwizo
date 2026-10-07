@@ -99,10 +99,18 @@ function withDefaults(settings) {
 }
 
 function publicTeacher(u) {
-  return u ? {
+  if (!u) return null;
+  let subjects = [];
+  let grades = [];
+  try { subjects = JSON.parse(u.subjects || '[]'); } catch (e) { /* keep [] */ }
+  try { grades = JSON.parse(u.grades || '[]'); } catch (e) { /* keep [] */ }
+  return {
     id: u.id, name: u.name, email: u.email, created_at: u.created_at,
-    role: u.role || '', onboarding_done: !!u.onboarding_done,
-  } : null;
+    role: u.role || '', job_title: u.job_title || '',
+    specialization: u.specialization || '',
+    subjects, grades,
+    onboarding_done: !!u.onboarding_done,
+  };
 }
 
 async function teacherCtx(req, env) {
@@ -173,13 +181,21 @@ async function handleUpdateMe(req, env, ctx) {
   return jsonResponse({ user: publicTeacher(user) });
 }
 
-/** Save onboarding answers (role) and mark onboarding complete. */
+/** Save onboarding answers and mark onboarding complete. */
 async function handleOnboarding(req, env, ctx) {
   let body;
   try { body = await readJson(req); } catch (e) { return err(e.message, 400); }
   const role = (body.role || '').trim().slice(0, 50);
   if (!role) return err('Please choose a role.');
-  const user = await ctx.store.updateUser(ctx.user.id, { role, onboarding_done: true });
+  const subjects = Array.isArray(body.subjects) ? body.subjects.map(s => String(s).slice(0, 60)).slice(0, 30) : [];
+  const grades = Array.isArray(body.grades) ? body.grades.map(g => String(g).slice(0, 30)).slice(0, 20) : [];
+  const user = await ctx.store.updateUser(ctx.user.id, {
+    role,
+    job_title: (body.job_title || '').trim().slice(0, 80),
+    specialization: (body.specialization || '').trim().slice(0, 80),
+    subjects, grades,
+    onboarding_done: true,
+  });
   return jsonResponse({ user: publicTeacher(user) });
 }
 
