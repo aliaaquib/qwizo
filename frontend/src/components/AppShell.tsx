@@ -68,22 +68,27 @@ export function AppShell() {
   };
 
   const initial = (user?.name || '?').trim().charAt(0).toUpperCase();
+  // Icon rail everywhere except Home — matches the Wayground reference.
+  const collapsed = location.pathname !== '/app';
 
   return (
     <div className="min-h-screen bg-neutral flex">
-      <aside className="w-60 shrink-0 bg-paper border-r border-line flex flex-col
-        sticky top-0 h-screen overflow-y-auto">
-        <div className="px-6 py-5">
-          <QwizoLogo badge badgeSize={40} />
+      <aside className={`${collapsed ? 'w-[72px]' : 'w-60'} shrink-0 bg-paper border-r border-line flex flex-col
+        sticky top-0 h-screen overflow-y-auto transition-[width] duration-200`}>
+        <div className={`${collapsed ? 'px-0 py-5 flex justify-center' : 'px-6 py-5'}`}>
+          {collapsed
+            ? <QwizoLogo variant="mark" markSize={36} />
+            : <QwizoLogo badge badgeSize={40} />}
         </div>
-        <nav className="flex-1 px-3 space-y-1">
+        <nav className={`flex-1 space-y-1 ${collapsed ? 'px-2' : 'px-3'}`}>
           {NAV.map(n => (
             <NavLink
               key={n.to}
               to={n.to}
               end={n.end}
+              title={collapsed ? n.label : undefined}
               className={({ isActive }) =>
-                `interact flex items-center gap-3 px-4 py-2 rounded-control text-[14px] font-medium ${
+                `interact ${collapsed ? 'justify-center px-0 py-3 has-tooltip' : 'gap-3 px-4 py-2'} flex items-center rounded-control text-[14px] font-medium ${
                   isActive
                     ? 'bg-lime/50 text-ink'
                     : 'text-ink/60 hover:text-ink hover:bg-neutral'
@@ -91,7 +96,9 @@ export function AppShell() {
               }
             >
               <span className="shrink-0">{n.icon}</span>
-              {n.label}
+              {collapsed
+                ? <span className="tooltip-bubble" role="tooltip">{n.label}</span>
+                : n.label}
             </NavLink>
           ))}
         </nav>
@@ -100,23 +107,29 @@ export function AppShell() {
           <div className="relative">
             <button
               onClick={() => setMenuOpen(o => !o)}
-              className="w-full flex items-center gap-3 rounded-2xl px-2 py-2 text-left
-                hover:bg-neutral transition-colors focus-visible:outline-2 focus-visible:outline-lime"
+              className={`w-full flex items-center gap-3 rounded-2xl py-2 text-left
+                hover:bg-neutral transition-colors focus-visible:outline-2 focus-visible:outline-lime
+                ${collapsed ? 'justify-center px-0' : 'px-2'}`}
               aria-haspopup="menu"
               aria-expanded={menuOpen}
+              title={collapsed ? user?.name : undefined}
             >
               <span className="w-10 h-10 rounded-full bg-sky flex items-center justify-center
                 text-[16px] font-bold text-ink shrink-0">
                 {initial}
               </span>
-              <span className="flex-1 min-w-0">
-                <span className="block text-[15px] font-medium truncate">{user?.name}</span>
-                <span className="block text-[13px] text-ink/50 truncate">{user?.email}</span>
-              </span>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
-                className={`w-4 h-4 text-ink/40 shrink-0 transition-transform ${menuOpen ? 'rotate-180' : ''}`}>
-                <path d="M6 9l6 6 6-6" />
-              </svg>
+              {!collapsed && (
+                <>
+                  <span className="flex-1 min-w-0">
+                    <span className="block text-[15px] font-medium truncate">{user?.name}</span>
+                    <span className="block text-[13px] text-ink/50 truncate">{user?.email}</span>
+                  </span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
+                    className={`w-4 h-4 text-ink/40 shrink-0 transition-transform ${menuOpen ? 'rotate-180' : ''}`}>
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </>
+              )}
             </button>
             {menuOpen && (
               <>
@@ -127,8 +140,9 @@ export function AppShell() {
                 />
                 <div
                   role="menu"
-                  className="absolute bottom-full left-0 right-0 mb-2 z-20 bg-white border border-line
-                    rounded-2xl shadow-lift py-1.5 overflow-hidden"
+                  className={`absolute bottom-full mb-2 z-20 bg-white border border-line
+                    rounded-2xl shadow-lift py-1.5 overflow-hidden
+                    ${collapsed ? 'left-0 w-48' : 'left-0 right-0'}`}
                 >
                   <Link
                     to="/app/settings"
