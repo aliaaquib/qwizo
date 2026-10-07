@@ -174,6 +174,94 @@ export function QuizList() {
     : section === 'shared' ? 'Shared with me'
     : 'All activities';
 
+  /** "Let's create your first quiz!" empty state — used by Created and All activities. */
+  const firstQuizEmpty = (
+    <div className="text-center pt-6">
+      <h2 className="text-[22px] font-bold text-ink mb-8">Let's create your first quiz!</h2>
+      <div className="relative mb-10 max-w-2xl mx-auto">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+          className="w-5 h-5 absolute left-5 top-1/2 -translate-y-1/2 text-ink pointer-events-none">
+          <circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" />
+        </svg>
+        <input
+          placeholder="Search for a quiz"
+          value={q}
+          onChange={e => setQ(e.target.value)}
+          className="w-full rounded-full border border-line bg-white py-3.5 text-[15px]
+            placeholder:text-ink/35 focus:outline-2 focus:outline-lime"
+          style={{ paddingLeft: '3.25rem', paddingRight: '1.25rem' }}
+        />
+      </div>
+      <p className="text-[16px] text-ink/70 mb-6 flex items-center justify-center gap-1">
+        Or create one using
+        <QwizoLogo badge badgeSize={40} />
+        <span className="font-extrabold tracking-tight text-[26px] text-lime">AI</span>
+      </p>
+      <div className="grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto text-left">
+        {AI_CARDS.map(c => (
+          <Link
+            key={c.to}
+            to={c.to}
+            className="group flex items-center gap-4 bg-white border border-line rounded-xl p-4
+              transition-all duration-180 hover:border-lime hover:shadow-soft hover:-translate-y-0.5
+              focus-visible:outline-2 focus-visible:outline-lime"
+          >
+            <span className={`w-12 h-12 rounded-lg ${c.iconBg} ${c.iconColor} flex items-center justify-center shrink-0`}>
+              {c.icon}
+            </span>
+            <span>
+              <span className="block text-[13px] text-ink/50">{c.eyebrow}</span>
+              <span className="block text-[16px] font-bold text-ink">{c.title}</span>
+            </span>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderContent = () => {
+    if (loading) {
+      return <div className="text-sm text-ink/40 py-8 text-center">Loading…</div>;
+    }
+    if (visible.length) {
+      return (
+        <div className="bg-paper border border-line rounded-card divide-y divide-line/60">
+          {visible.map(renderRow)}
+        </div>
+      );
+    }
+    if (section === 'used') {
+      return (
+        <div className="text-center pt-16">
+          <div className="text-[26px] font-bold text-ink/70 mb-3">🎲 Find your previously used quizzes here</div>
+          <p className="text-[15px] text-ink/55 max-w-xl mx-auto">
+            Share a quiz with your students — once they start submitting, it will appear here.
+          </p>
+        </div>
+      );
+    }
+    if (section === 'shared') {
+      return (
+        <div className="text-center pt-16">
+          <div className="text-[26px] font-bold text-ink/70 mb-3">🛩️ Find quizzes other teachers have shared with you</div>
+          <p className="text-[15px] text-ink/55 max-w-xl mx-auto">
+            Tip: browse <Link to="/app/templates" className="font-semibold text-ink underline underline-offset-4 decoration-lime">Templates</Link> to
+            use quizzes shared by the Qwizo community.
+          </p>
+        </div>
+      );
+    }
+    if (q || tab) {
+      return (
+        <EmptyState
+          title="No quizzes match"
+          body="Try a different search or filter."
+        />
+      );
+    }
+    return firstQuizEmpty;
+  };
+
   const renderRow = (quiz: QuizRow) => (
     <div key={quiz.id} className="row-interactive flex items-center gap-4 px-5 py-4 rounded-card">
       <div className="flex-1 min-w-0">
@@ -294,7 +382,7 @@ export function QuizList() {
 
         {/* tabs — pill only on the selected one */}
         {section === 'created' && (
-          <div className="flex items-center gap-7 mb-8">
+          <div className="flex items-center gap-7 mb-2">
             {TABS.map(t => (
               <button
                 key={t.id}
@@ -311,65 +399,11 @@ export function QuizList() {
           </div>
         )}
 
-        {loading ? (
-          <div className="text-sm text-ink/40 py-8 text-center">Loading…</div>
-        ) : visible.length ? (
-          <div className="bg-paper border border-line rounded-card divide-y divide-line/60">
-            {visible.map(renderRow)}
-          </div>
-        ) : section === 'shared' ? (
-          <EmptyState
-            title="Nothing shared with you yet"
-            body="When another teacher shares a quiz with you, it will appear here."
-          />
-        ) : q || tab || section !== 'created' ? (
-          <EmptyState
-            title="No quizzes match"
-            body="Try a different search or filter."
-          />
-        ) : (
-          <div className="text-center pt-6">
-            <h2 className="text-[22px] font-bold text-ink mb-8">Let's create your first quiz!</h2>
-            <div className="relative mb-10 max-w-2xl mx-auto">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
-                className="w-5 h-5 absolute left-5 top-1/2 -translate-y-1/2 text-ink pointer-events-none">
-                <circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" />
-              </svg>
-              <input
-                placeholder="Search for a quiz"
-                value={q}
-                onChange={e => setQ(e.target.value)}
-                className="w-full rounded-full border border-line bg-white py-3.5 text-[15px]
-                  placeholder:text-ink/35 focus:outline-2 focus:outline-lime"
-                style={{ paddingLeft: '3.25rem', paddingRight: '1.25rem' }}
-              />
-            </div>
-            <p className="text-[16px] text-ink/70 mb-6 flex items-center justify-center gap-1">
-              Or create one using
-              <QwizoLogo badge badgeSize={40} />
-              <span className="font-extrabold tracking-tight text-[26px] text-lime">AI</span>
-            </p>
-            <div className="grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto text-left">
-              {AI_CARDS.map(c => (
-                <Link
-                  key={c.to}
-                  to={c.to}
-                  className="group flex items-center gap-4 bg-white border border-line rounded-xl p-4
-                    transition-all duration-180 hover:border-lime hover:shadow-soft hover:-translate-y-0.5
-                    focus-visible:outline-2 focus-visible:outline-lime"
-                >
-                  <span className={`w-12 h-12 rounded-lg ${c.iconBg} ${c.iconColor} flex items-center justify-center shrink-0`}>
-                    {c.icon}
-                  </span>
-                  <span>
-                    <span className="block text-[13px] text-ink/50">{c.eyebrow}</span>
-                    <span className="block text-[16px] font-bold text-ink">{c.title}</span>
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
+        <p className="text-[15px] font-bold text-ink/60 mb-8 mt-6">
+          {visible.length} quiz{visible.length === 1 ? '' : 'zes'}
+        </p>
+
+        {renderContent()}
         {dialog}
         {toastEl}
       </div>
