@@ -35,6 +35,7 @@ export interface Quiz {
   subject: string;
   curriculum: string;
   level: string;
+  grade?: string;
   topic: string;
   time_limit_sec: number | null;
   settings: QuizSettings;

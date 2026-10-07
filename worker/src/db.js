@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS quizzes (
   subject TEXT NOT NULL DEFAULT '',
   curriculum TEXT NOT NULL DEFAULT '',
   level TEXT NOT NULL DEFAULT '',
+  grade TEXT NOT NULL DEFAULT '',
   topic TEXT NOT NULL DEFAULT '',
   time_limit_sec INTEGER,
   settings TEXT NOT NULL DEFAULT '{}',
@@ -144,6 +145,7 @@ export class TeacherStore {
       ['user', 'specialization', `TEXT NOT NULL DEFAULT ''`],
       ['user', 'subjects', `TEXT NOT NULL DEFAULT '[]'`],
       ['user', 'grades', `TEXT NOT NULL DEFAULT '[]'`],
+      ['quizzes', 'grade', `TEXT NOT NULL DEFAULT ''`],
     ]) {
       try {
         this.sql.exec(`ALTER TABLE ${table} ADD COLUMN ${col} ${def}`);
@@ -231,17 +233,17 @@ export class TeacherStore {
     const now = Date.now();
     const id = crypto.randomUUID();
     this.sql.exec(
-      `INSERT INTO quizzes (id, title, description, subject, curriculum, level, topic, time_limit_sec, settings, status, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft', ?, ?)`,
+      `INSERT INTO quizzes (id, title, description, subject, curriculum, level, grade, topic, time_limit_sec, settings, status, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft', ?, ?)`,
       id, data.title || 'Untitled quiz', data.description || '', data.subject || '',
-      data.curriculum || '', data.level || '', data.topic || '',
+      data.curriculum || '', data.level || '', data.grade || '', data.topic || '',
       data.time_limit_sec ?? null, JSON.stringify(data.settings || {}), now, now
     );
     return this.getQuiz(id);
   }
 
   updateQuiz(id, patch) {
-    const allowed = ['title', 'description', 'subject', 'curriculum', 'level', 'topic', 'time_limit_sec', 'settings', 'status', 'share_code', 'published_snapshot', 'published_at'];
+    const allowed = ['title', 'description', 'subject', 'curriculum', 'level', 'grade', 'topic', 'time_limit_sec', 'settings', 'status', 'share_code', 'published_snapshot', 'published_at'];
     const sets = [], args = [];
     for (const k of allowed) {
       if (patch[k] !== undefined) {

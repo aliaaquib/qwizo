@@ -521,6 +521,7 @@ export function QuizEditor() {
         topic: key === 'topic' ? e.target.value : quizRef.current!.topic,
         curriculum: key === 'curriculum' ? e.target.value : quizRef.current!.curriculum,
         level: key === 'level' ? e.target.value : quizRef.current!.level,
+        grade: key === 'grade' ? e.target.value : quizRef.current!.grade,
         time_limit_sec: key === 'time_limit_sec' ? (v as number | null) : quizRef.current!.time_limit_sec,
       });
     },
@@ -593,6 +594,33 @@ export function QuizEditor() {
           <div>
             <label className="block text-sm font-medium text-ink mb-2">Level / Year</label>
             <Input maxLength={100} {...metaInput('level')} />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-ink mb-2">Grade</label>
+            <select
+              value={quiz.grade || ''}
+              onChange={e => {
+                const v = e.target.value;
+                updateMeta({ grade: v } as Partial<Quiz>);
+                scheduleMetaSave({
+                  title: quizRef.current!.title,
+                  description: quizRef.current!.description,
+                  subject: quizRef.current!.subject,
+                  topic: quizRef.current!.topic,
+                  curriculum: quizRef.current!.curriculum,
+                  level: quizRef.current!.level,
+                  grade: v,
+                  time_limit_sec: quizRef.current!.time_limit_sec,
+                });
+              }}
+              className="w-full rounded-xl border border-line bg-white px-4 py-2.5 text-[15px]
+                focus:outline-none focus:border-lime focus:ring-2 focus:ring-lime/30 transition"
+            >
+              <option value="">Select grade…</option>
+              {Array.from({ length: 12 }, (_, i) => `Grade ${i + 1}`).map(g => (
+                <option key={g} value={g}>{g}</option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-ink mb-2">Time limit (minutes, optional)</label>
