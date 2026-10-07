@@ -162,9 +162,15 @@ export function AppShell() {
         </div>
       </aside>
       <main className="flex-1 min-w-0">
-        <div key={location.pathname} className="page-enter max-w-6xl mx-auto px-8 py-10">
-          <Outlet />
-        </div>
+        {location.pathname === '/app/quizzes' ? (
+          <div key={location.pathname} className="page-enter">
+            <Outlet />
+          </div>
+        ) : (
+          <div key={location.pathname} className="page-enter max-w-6xl mx-auto px-8 py-10">
+            <Outlet />
+          </div>
+        )}
       </main>
     </div>
   );

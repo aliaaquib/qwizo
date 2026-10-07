@@ -99,7 +99,7 @@ export function QuizList() {
   };
 
   return (
-    <div className="flex -mx-8 -my-10">
+    <div className="flex min-h-[calc(100vh-0px)]">
       {/* sub-sidebar — flush against the main sidebar */}
       <aside className="w-60 shrink-0 hidden md:block bg-paper border-r border-line px-6 py-8">
         <h2 className="text-[18px] font-bold text-ink mb-4">Library</h2>
