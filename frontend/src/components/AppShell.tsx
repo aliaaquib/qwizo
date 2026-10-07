@@ -88,17 +88,26 @@ export function AppShell() {
               end={n.end}
               title={collapsed ? n.label : undefined}
               className={({ isActive }) =>
-                `interact ${collapsed ? 'justify-center px-0 py-3 has-tooltip' : 'gap-3 px-4 py-2'} flex items-center rounded-control text-[14px] font-medium ${
+                `interact flex items-center rounded-control text-[14px] font-medium ${
+                  collapsed ? 'justify-center px-0 py-3' : 'gap-3 px-4 py-2'
+                } ${
                   isActive
                     ? 'bg-lime/50 text-ink'
                     : 'text-ink/60 hover:text-ink hover:bg-neutral'
                 }`
               }
             >
-              <span className="shrink-0">{n.icon}</span>
-              {collapsed
-                ? <span className="tooltip-bubble" role="tooltip">{n.label}</span>
-                : n.label}
+              {collapsed ? (
+                <span className="has-tooltip shrink-0">
+                  {n.icon}
+                  <span className="tooltip-bubble" role="tooltip">{n.label}</span>
+                </span>
+              ) : (
+                <>
+                  <span className="shrink-0">{n.icon}</span>
+                  {n.label}
+                </>
+              )}
             </NavLink>
           ))}
         </nav>
