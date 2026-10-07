@@ -344,10 +344,10 @@ export function QuizList() {
                 style={{ paddingLeft: '3.25rem', paddingRight: '1.25rem' }}
               />
             </div>
-            <p className="text-[16px] text-ink/70 mb-6 flex items-center justify-center gap-2">
+            <p className="text-[16px] text-ink/70 mb-6 flex items-center justify-center gap-2.5">
               Or create one using
-              <QwizoLogo variant="mark" markSize={26} />
-              <span className="font-extrabold text-ink tracking-tight text-[18px]">AI</span>
+              <QwizoLogo variant="full" markSize={24} />
+              <span className="font-extrabold tracking-tight text-[20px] text-lime">AI</span>
             </p>
             <div className="grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto text-left">
               {AI_CARDS.map(c => (
