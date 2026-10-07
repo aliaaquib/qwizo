@@ -217,6 +217,7 @@ async function handleCreateQuiz(req, env, ctx) {
     subject: (body.subject || '').slice(0, 100),
     curriculum: (body.curriculum || '').slice(0, 100),
     level: (body.level || '').slice(0, 100),
+    grade: (body.grade || '').slice(0, 30),
     topic: (body.topic || '').slice(0, 200),
     time_limit_sec: body.time_limit_sec ? Math.min(Math.max(parseInt(body.time_limit_sec, 10), 60), 86400) : null,
     settings: withDefaults(body.settings),
@@ -238,8 +239,8 @@ async function handleUpdateQuiz(req, env, ctx, params) {
   let body;
   try { body = await readJson(req); } catch (e) { return err(e.message, 400); }
   const patch = {};
-  for (const k of ['title', 'description', 'subject', 'curriculum', 'level', 'topic']) {
-    if (body[k] !== undefined) patch[k] = String(body[k]).slice(0, k === 'title' ? 200 : 2000);
+  for (const k of ['title', 'description', 'subject', 'curriculum', 'level', 'grade', 'topic']) {
+    if (body[k] !== undefined) patch[k] = String(body[k]).slice(0, k === 'title' ? 200 : k === 'grade' ? 30 : 2000);
   }
   if (body.time_limit_sec !== undefined) {
     patch.time_limit_sec = body.time_limit_sec ? Math.min(Math.max(parseInt(body.time_limit_sec, 10), 60), 86400) : null;
@@ -304,9 +305,10 @@ async function handlePublishQuiz(req, env, ctx, params) {
       description: quiz.description,
       subject: quiz.subject,
       level: quiz.level,
+      grade: quiz.grade || '',
       topic: quiz.topic,
       question_count: questions.length,
-      snapshot: { ...snapshot, description: quiz.description, subject: quiz.subject, level: quiz.level, topic: quiz.topic },
+      snapshot: { ...snapshot, description: quiz.description, subject: quiz.subject, level: quiz.level, grade: quiz.grade || '', topic: quiz.topic },
     });
   } catch (e) {
     console.error('template save failed', e);
@@ -467,6 +469,7 @@ async function handleListTemplates(req, env, ctx, params, url) {
   const sp = url.searchParams;
   const { templates, total } = await templateStore(env).listTemplates({
     search: sp.get('q') || '', subject: sp.get('subject') || '',
+    grade: sp.get('grade') || '',
     limit: sp.get('limit') || 24, offset: sp.get('offset') || 0,
   });
   return jsonResponse({ templates, total });

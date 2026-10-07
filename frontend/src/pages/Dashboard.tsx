@@ -2,19 +2,17 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthContext';
 import { api } from '@/lib/api/client';
-import type { Quiz } from '@/types';
-import { EmptyState, StatusBadge, fmtDate } from '@/components/shared';
+import type { QuizTemplate } from '@/types';
+import { EmptyState } from '@/components/shared';
 import { Button } from '@/components/ui';
 
-// Dashboard — Qwizo's home. Greeting, overlapping quick-action cards on a
-// brand band, search, "browse for subject / grade" selectors, stats, recents.
+// Dashboard — greeting, quick actions, template search,
+// "browse templates for subject / grade", templates by subject.
 
 function daypart() {
   const h = new Date().getHours();
   return h < 12 ? 'morning' : h < 18 ? 'afternoon' : 'evening';
 }
-
-const GRADES = Array.from({ length: 12 }, (_, i) => `Grade ${i + 1}`);
 
 const ACTIONS = [
   {
@@ -51,72 +49,59 @@ const ACTIONS = [
   },
 ];
 
+interface SubjectGroup {
+  subject: string;
+  templates: QuizTemplate[];
+}
+
 export function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [stats, setStats] = useState<Record<string, number> | null>(null);
-  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [groups, setGroups] = useState<SubjectGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [query, setQuery] = useState('');
   const [subject, setSubject] = useState('');
   const [grade, setGrade] = useState('');
+  const [subjects, setSubjects] = useState<string[]>([]);
 
   const load = () => {
     setLoading(true);
     setLoadError(false);
-    Promise.all([api.stats(), api.listQuizzes()])
-      .then(([s, q]) => { setStats(s.stats); setQuizzes(q.quizzes); })
+    const params: Record<string, string> = { limit: '60' };
+    if (subject) params.subject = subject;
+    if (grade) params.grade = grade;
+    Promise.all([
+      api.listTemplates(params),
+      api.listTemplateSubjects(),
+    ])
+      .then(([t, s]) => {
+        const bySubject = new Map<string, QuizTemplate[]>();
+        for (const tmpl of t.templates) {
+          const key = tmpl.subject || 'General';
+          if (!bySubject.has(key)) bySubject.set(key, []);
+          bySubject.get(key)!.push(tmpl);
+        }
+        setGroups([...bySubject.entries()].map(([subject, templates]) => ({ subject, templates })));
+        setSubjects(s.subjects.map(x => x.subject));
+      })
       .catch(() => setLoadError(true))
       .finally(() => setLoading(false));
   };
 
-  useEffect(load, []);
+  useEffect(load, [subject, grade]);
 
   const firstName = user?.name.split(' ')[0] || 'there';
 
-  // Subjects: prefer onboarding picks, fall back to subjects on quizzes.
-  const subjects = useMemo(() => {
-    const fromProfile = (user?.subjects || []).filter(Boolean);
-    if (fromProfile.length) return fromProfile;
-    const seen: string[] = [];
-    for (const q of quizzes) {
-      const s = (q.subject || '').trim();
-      if (s && !seen.includes(s)) seen.push(s);
-    }
-    return seen.slice(0, 12);
-  }, [user, quizzes]);
-
-  // Grades: prefer onboarding picks, fall back to grades on quizzes.
   const grades = useMemo(() => {
     const fromProfile = (user?.grades || []).filter(Boolean);
     if (fromProfile.length) return fromProfile;
-    const seen: string[] = [];
-    for (const q of quizzes) {
-      const g = (q.grade || '').trim();
-      if (g && !seen.includes(g)) seen.push(g);
-    }
-    return seen.length ? seen : GRADES;
-  }, [user, quizzes]);
-
-  const filtered = useMemo(() => {
-    return quizzes.filter(q => {
-      if (subject && (q.subject || '').toLowerCase() !== subject.toLowerCase()) return false;
-      if (grade && (q.grade || '') !== grade) return false;
-      return true;
-    }).slice(0, 8);
-  }, [quizzes, subject, grade]);
-
-  const cards = stats ? [
-    { label: 'Total quizzes', value: stats.quizzes || 0 },
-    { label: 'Published', value: stats.published || 0 },
-    { label: 'Student submissions', value: stats.submissions || 0 },
-    { label: 'Bank questions', value: stats.bank || 0 },
-  ] : [];
+    return Array.from({ length: 12 }, (_, i) => `Grade ${i + 1}`);
+  }, [user]);
 
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate(`/app/quizzes${query.trim() ? `?q=${encodeURIComponent(query.trim())}` : ''}`);
+    navigate(`/app/templates${query.trim() ? `?q=${encodeURIComponent(query.trim())}` : ''}`);
   };
 
   return (
@@ -153,7 +138,7 @@ export function Dashboard() {
         </div>
       </div>
 
-      {/* search */}
+      {/* search templates */}
       <form onSubmit={submitSearch} className="flex gap-2 max-w-2xl mx-auto mb-10 mt-14">
         <div className="relative flex-1">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
@@ -185,7 +170,7 @@ export function Dashboard() {
         <div className="text-sm text-ink/40 py-8 text-center">Loading…</div>
       ) : loadError ? (
         <EmptyState
-          title="Could not load your dashboard"
+          title="Could not load templates"
           body="Check your connection and try again."
           action={<Button size="sm" onClick={load}>Retry</Button>}
         />
@@ -194,7 +179,7 @@ export function Dashboard() {
           {/* browse selectors */}
           <div className="flex items-center gap-4 mb-8">
             <span className="flex-1 h-px bg-line" aria-hidden="true" />
-            <span className="text-ink/60 text-[15px] font-medium whitespace-nowrap">Browse quizzes for</span>
+            <span className="text-ink/60 text-[15px] font-medium whitespace-nowrap">Browse templates for</span>
             <label className="relative">
               <span className="sr-only">Subject</span>
               <select
@@ -230,60 +215,85 @@ export function Dashboard() {
             <span className="flex-1 h-px bg-line" aria-hidden="true" />
           </div>
 
-          {/* stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            {cards.map(c => (
-              <div key={c.label} className="bg-paper border border-line rounded-card p-5">
-                <div className="text-2xl font-bold">{c.value}</div>
-                <div className="text-[13px] text-ink/55 mt-1">{c.label}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* quizzes */}
-          <div className="flex items-baseline justify-between mb-3">
-            <h3 className="text-base font-bold">
-              {subject || grade
-                ? `Quizzes${subject ? ` · ${subject}` : ''}${grade ? ` · ${grade}` : ''}`
-                : 'Recent quizzes'}
-            </h3>
+          {/* templates by subject */}
+          <div className="flex items-baseline gap-3 mb-4">
+            <h3 className="text-base font-bold">Templates</h3>
+            <Link
+              to="/app/templates"
+              className="text-[14px] font-semibold underline underline-offset-4 decoration-ink/30
+                hover:decoration-ink flex items-center gap-1"
+            >
+              See all <span aria-hidden="true">→</span>
+            </Link>
             {(subject || grade) && (
               <button
                 onClick={() => { setSubject(''); setGrade(''); }}
-                className="text-[13px] font-medium text-ink/55 hover:text-ink"
+                className="ml-auto text-[13px] font-medium text-ink/55 hover:text-ink"
               >
                 Clear filters
               </button>
             )}
           </div>
-          {filtered.length ? (
-            <div className="bg-paper border border-line rounded-card divide-y divide-line/60">
-              {filtered.map(q => (
-                <div key={q.id} className="row-interactive flex items-center gap-4 px-5 py-4 rounded-card">
-                  <div className="flex-1 min-w-0">
-                    <Link to={`/app/quizzes/${q.id}`} className="interact font-medium text-[15px] truncate block hover:underline hover:decoration-ink/30 hover:underline-offset-4">
-                      {q.title}
-                    </Link>
-                    <div className="text-xs text-ink/40 mt-0.5">
-                      {(q as Quiz & { question_count?: number }).question_count ?? 0} questions ·{' '}
-                      {(q as Quiz & { submission_count?: number }).submission_count ?? 0} submissions ·{' '}
-                      {q.grade ? `${q.grade} · ` : ''}updated {fmtDate(q.updated_at)}
+
+          {groups.length ? (
+            <div className="flex flex-col gap-5">
+              {groups.map(g => (
+                <div
+                  key={g.subject}
+                  className="relative bg-white border border-line rounded-2xl p-6 md:p-8 overflow-hidden"
+                >
+                  {/* folded corner */}
+                  <span
+                    aria-hidden="true"
+                    className="absolute top-0 right-0 w-10 h-10 bg-neutral border-l border-b border-line
+                      rounded-bl-xl"
+                    style={{ clipPath: 'polygon(0 0, 100% 100%, 0 100%)' }}
+                  />
+                  <div className="flex gap-8">
+                    <div className="w-48 shrink-0">
+                      <h4 className="text-[20px] font-bold text-ink leading-tight">{g.subject}</h4>
+                      <p className="text-[13px] text-ink/50 mt-1">
+                        {g.templates.length} template{g.templates.length === 1 ? '' : 's'}
+                      </p>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      {g.templates.slice(0, 3).map((t, i) => (
+                        <Link
+                          key={t.id}
+                          to="/app/templates"
+                          className="flex items-baseline gap-4 py-2.5 group/tmpl"
+                        >
+                          <span className="text-[14px] text-ink/50 w-20 shrink-0">Template {i + 1}</span>
+                          <span className="text-[15px] font-medium text-ink truncate
+                            group-hover/tmpl:underline group-hover/tmpl:decoration-lime group-hover/tmpl:underline-offset-4">
+                            {t.title}
+                          </span>
+                          <span className="ml-auto text-[13px] text-ink/40 shrink-0">
+                            {t.question_count} questions
+                          </span>
+                        </Link>
+                      ))}
+                      {g.templates.length > 3 && (
+                        <Link
+                          to={`/app/templates?subject=${encodeURIComponent(g.subject)}`}
+                          className="inline-flex items-center gap-2 mt-2 text-[14px] font-bold text-ink
+                            hover:underline hover:decoration-lime hover:underline-offset-4"
+                        >
+                          See all <span aria-hidden="true">→</span>
+                        </Link>
+                      )}
                     </div>
                   </div>
-                  <StatusBadge status={q.status} />
-                  <Link to={`/app/quizzes/${q.id}`}>
-                    <Button variant="secondary" size="sm">Open</Button>
-                  </Link>
                 </div>
               ))}
             </div>
           ) : (
             <div className="bg-paper border border-line rounded-card p-12 text-center">
-              <h3 className="font-bold mb-1">No quizzes found</h3>
+              <h3 className="font-bold mb-1">No templates yet</h3>
               <p className="text-sm text-ink/55 mb-4">
                 {subject || grade
                   ? 'Try a different subject or grade.'
-                  : 'Create your first quiz — with AI or by hand.'}
+                  : 'When teachers publish quizzes, they appear here for everyone.'}
               </p>
               <Link to="/app/quizzes/new"><Button>Create quiz</Button></Link>
             </div>

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '@/lib/api/client';
 import type { QuizTemplate } from '@/types';
 import { useAuth } from '@/features/auth/AuthContext';
@@ -21,6 +21,16 @@ export function Templates() {
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState('');
   const [subject, setSubject] = useState('');
+  const [searchParams] = useSearchParams();
+
+  // Allow deep-linking with ?subject= or ?q= (e.g. from the dashboard).
+  useEffect(() => {
+    const s = searchParams.get('subject');
+    const qq = searchParams.get('q');
+    if (s) setSubject(s);
+    if (qq) setQ(qq);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [using, setUsing] = useState<string | null>(null);
 
   const draw = useCallback(async () => {

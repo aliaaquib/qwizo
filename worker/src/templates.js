@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS templates (
   description TEXT NOT NULL DEFAULT '',
   subject TEXT NOT NULL DEFAULT '',
   level TEXT NOT NULL DEFAULT '',
+  grade TEXT NOT NULL DEFAULT '',
   topic TEXT NOT NULL DEFAULT '',
   question_count INTEGER NOT NULL DEFAULT 0,
   snapshot TEXT NOT NULL DEFAULT '{}',
@@ -39,6 +40,11 @@ export class TemplateStore {
     this.env = env;
     this.sql = ctx.storage.sql;
     this.sql.exec(SCHEMA);
+    try {
+      this.sql.exec(`ALTER TABLE templates ADD COLUMN grade TEXT NOT NULL DEFAULT ''`);
+    } catch (e) {
+      if (!/duplicate column/i.test(e.message || '')) throw e;
+    }
   }
 
   /** RPC entrypoint: POST {method, args}. Private helpers are unreachable. */
@@ -77,14 +83,15 @@ export class TemplateStore {
     this.sql.exec(
       `INSERT INTO templates
          (id, source_quiz_id, teacher_id, teacher_name, title, description,
-          subject, level, topic, question_count, snapshot, use_count, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
+          subject, level, grade, topic, question_count, snapshot, use_count, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)
        ON CONFLICT(source_quiz_id, teacher_id) DO UPDATE SET
          teacher_name = excluded.teacher_name,
          title = excluded.title,
          description = excluded.description,
          subject = excluded.subject,
          level = excluded.level,
+         grade = excluded.grade,
          topic = excluded.topic,
          question_count = excluded.question_count,
          snapshot = excluded.snapshot,
@@ -92,6 +99,7 @@ export class TemplateStore {
       id, data.source_quiz_id, data.teacher_id, (data.teacher_name || '').slice(0, 80),
       (data.title || 'Untitled quiz').slice(0, 200), (data.description || '').slice(0, 2000),
       (data.subject || '').slice(0, 100), (data.level || '').slice(0, 100),
+      (data.grade || '').slice(0, 30),
       (data.topic || '').slice(0, 200), data.question_count || 0,
       JSON.stringify(data.snapshot || {}), now, now
     );
@@ -102,12 +110,16 @@ export class TemplateStore {
   }
 
   /** List templates for the gallery — without the heavy snapshot payload. */
-  listTemplates({ search, subject, limit, offset } = {}) {
+  listTemplates({ search, subject, grade, limit, offset } = {}) {
     const conds = [];
     const args = [];
     if (subject) {
       conds.push('subject = ?');
       args.push(subject);
+    }
+    if (grade) {
+      conds.push('grade = ?');
+      args.push(grade);
     }
     if (search) {
       conds.push('(title LIKE ? OR description LIKE ? OR subject LIKE ? OR topic LIKE ?)');
@@ -119,7 +131,7 @@ export class TemplateStore {
     const off = Math.max(parseInt(offset, 10) || 0, 0);
     const rows = this._all(
       `SELECT id, source_quiz_id, teacher_id, teacher_name, title, description,
-              subject, level, topic, question_count, use_count, created_at, updated_at
+              subject, level, grade, topic, question_count, use_count, created_at, updated_at
        FROM templates ${where}
        ORDER BY updated_at DESC
        LIMIT ? OFFSET ?`,

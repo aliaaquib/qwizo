@@ -217,6 +217,7 @@ export interface QuizTemplate {
   description: string;
   subject: string;
   level: string;
+  grade?: string;
   topic: string;
   question_count: number;
   use_count: number;
