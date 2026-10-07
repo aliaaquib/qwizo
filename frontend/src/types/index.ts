@@ -9,6 +9,8 @@ export interface Teacher {
   id: string;
   name: string;
   email: string;
+  role?: string;
+  onboarding_done?: boolean;
 }
 
 export interface QuizSettings {

@@ -99,7 +99,10 @@ function withDefaults(settings) {
 }
 
 function publicTeacher(u) {
-  return u ? { id: u.id, name: u.name, email: u.email, created_at: u.created_at } : null;
+  return u ? {
+    id: u.id, name: u.name, email: u.email, created_at: u.created_at,
+    role: u.role || '', onboarding_done: !!u.onboarding_done,
+  } : null;
 }
 
 async function teacherCtx(req, env) {
@@ -167,6 +170,16 @@ async function handleUpdateMe(req, env, ctx) {
   const name = (body.name || '').trim().slice(0, 80);
   if (!name) return err('Please enter your name.');
   const user = await ctx.store.updateUser(ctx.user.id, { name });
+  return jsonResponse({ user: publicTeacher(user) });
+}
+
+/** Save onboarding answers (role) and mark onboarding complete. */
+async function handleOnboarding(req, env, ctx) {
+  let body;
+  try { body = await readJson(req); } catch (e) { return err(e.message, 400); }
+  const role = (body.role || '').trim().slice(0, 50);
+  if (!role) return err('Please choose a role.');
+  const user = await ctx.store.updateUser(ctx.user.id, { role, onboarding_done: true });
   return jsonResponse({ user: publicTeacher(user) });
 }
 
@@ -835,6 +848,7 @@ const ROUTES = [
   ['POST', /^\/api\/auth\/logout$/, handleLogout, false],
   ['GET', /^\/api\/auth\/me$/, async (req, env, ctx) => jsonResponse({ user: publicTeacher(ctx.user) }), true],
   ['PUT', /^\/api\/auth\/me$/, handleUpdateMe, true],
+  ['POST', /^\/api\/auth\/onboarding$/, handleOnboarding, true],
   ['GET', /^\/api\/stats$/, handleDashboardStats, true],
   // quizzes
   ['GET', /^\/api\/quizzes$/, handleListQuizzes, true],

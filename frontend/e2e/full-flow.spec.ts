@@ -17,7 +17,10 @@ test('teacher creates, publishes; student takes; teacher sees results', async ({
   await page.getByPlaceholder('you@school.edu').fill(email);
   await page.getByPlaceholder('At least 8 characters').fill('password123');
   await page.getByRole('button', { name: 'Create account' }).click();
-  await expect(page).toHaveURL(/\/app/, { timeout: 15_000 });
+  await expect(page).toHaveURL(/\/app\/onboarding/, { timeout: 15_000 });
+  // complete onboarding: pick a role
+  await page.getByRole('button', { name: /K-12 School/ }).click();
+  await page.waitForURL('**/app', { timeout: 15_000 });
 
   // --- blank quiz ---
   await page.goto('/app/quizzes/new');

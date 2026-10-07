@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS user (
   name TEXT NOT NULL,
   email TEXT NOT NULL,
   password_hash TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT '',
+  onboarding_done INTEGER NOT NULL DEFAULT 0,
   created_at INTEGER NOT NULL
 );
 CREATE TABLE IF NOT EXISTS quizzes (
@@ -134,6 +136,17 @@ export class TeacherStore {
     this.env = env;
     this.sql = ctx.storage.sql;
     this.sql.exec(SCHEMA);
+    // Column migrations for existing databases (additive only, idempotent).
+    for (const [table, col, def] of [
+      ['user', 'role', `TEXT NOT NULL DEFAULT ''`],
+      ['user', 'onboarding_done', 'INTEGER NOT NULL DEFAULT 0'],
+    ]) {
+      try {
+        this.sql.exec(`ALTER TABLE ${table} ADD COLUMN ${col} ${def}`);
+      } catch (e) {
+        if (!/duplicate column/i.test(e.message || '')) throw e;
+      }
+    }
   }
 
   /** RPC entrypoint: POST {method, args}. Private helpers are unreachable. */
@@ -169,11 +182,16 @@ export class TeacherStore {
   }
 
   getUser(id) {
-    return this._one('SELECT id, name, email, password_hash, created_at FROM user WHERE id = ?', id);
+    return this._one('SELECT id, name, email, password_hash, role, onboarding_done, created_at FROM user WHERE id = ?', id);
   }
 
-  updateUser(id, { name }) {
-    this.sql.exec('UPDATE user SET name = ? WHERE id = ?', name, id);
+  updateUser(id, { name, role, onboarding_done }) {
+    const sets = [];
+    const args = [];
+    if (name !== undefined) { sets.push('name = ?'); args.push(name); }
+    if (role !== undefined) { sets.push('role = ?'); args.push(String(role).slice(0, 50)); }
+    if (onboarding_done !== undefined) { sets.push('onboarding_done = ?'); args.push(onboarding_done ? 1 : 0); }
+    if (sets.length) this.sql.exec(`UPDATE user SET ${sets.join(', ')} WHERE id = ?`, ...args, id);
     return this.getUser(id);
   }
 

@@ -19,7 +19,7 @@ export function Signup() {
     try {
       const d = await api.signup(name.trim(), email.trim(), password);
       setUser(d.user);
-      navigate('/app', { replace: true });
+      navigate('/app/onboarding', { replace: true });
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Signup failed.');
       setBusy(false);
