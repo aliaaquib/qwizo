@@ -346,8 +346,8 @@ export function QuizList() {
             </div>
             <p className="text-[16px] text-ink/70 mb-6 flex items-center justify-center gap-1">
               Or create one using
-              <QwizoLogo variant="full" markSize={34} />
-              <span className="font-extrabold tracking-tight text-[22px] text-lime">AI</span>
+              <QwizoLogo badge badgeSize={40} />
+              <span className="font-extrabold tracking-tight text-[26px] text-lime">AI</span>
             </p>
             <div className="grid sm:grid-cols-3 gap-4 max-w-3xl mx-auto text-left">
               {AI_CARDS.map(c => (
