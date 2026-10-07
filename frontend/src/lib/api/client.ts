@@ -1,6 +1,6 @@
 import type {
   Teacher, Quiz, Question, BankItem, Submission, SubmissionDetail, ResultsSummary,
-  ApiError, QuestionType,
+  ApiError, QuestionType, QuizTemplate,
   PublicQuiz, StudentAnswer, StudentResultData,
 } from '@/types';
 
@@ -131,6 +131,20 @@ export const api = {
     request<{ question: Question }>(`/api/bank/${id}/add-to-quiz`, {
       method: 'POST', body: JSON.stringify({ quiz_id }),
     }),
+
+  // templates (shared gallery)
+  listTemplates: (params: Record<string, string> = {}) => {
+    const q = new URLSearchParams(params).toString();
+    return request<{ templates: QuizTemplate[]; total: number }>(`/api/templates${q ? `?${q}` : ''}`);
+  },
+  listTemplateSubjects: () =>
+    request<{ subjects: { subject: string; c: number }[] }>('/api/templates/subjects'),
+  getTemplate: (id: string) =>
+    request<{ template: QuizTemplate & { snapshot: string } }>(`/api/templates/${id}`),
+  useTemplate: (id: string) =>
+    request<{ quiz: Quiz }>(`/api/templates/${id}/use`, { method: 'POST' }),
+  deleteTemplate: (id: string) =>
+    request<{ ok: true }>(`/api/templates/${id}`, { method: 'DELETE' }),
 
   // AI
   aiGenerate: (body: Record<string, unknown>) =>

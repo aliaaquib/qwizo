@@ -6,6 +6,7 @@
  */
 
 import { TeacherStore } from './db.js';
+import { TemplateStore } from './templates.js';
 
 /**
  * Proxy to a teacher's Durable Object. Every data call becomes
@@ -29,6 +30,28 @@ function teacherStore(env, teacherId) {
     },
   });
 }
+
+/**
+ * Proxy to the single global TemplateStore. Same RPC-over-HTTP pattern as
+ * teacherStore; the fixed name keeps one shared database for all teachers.
+ */
+function templateStore(env) {
+  const id = env.TEMPLATE_STORE.idFromName('templates:global');
+  const stub = env.TEMPLATE_STORE.get(id);
+  return new Proxy({}, {
+    get: (_, method) => async (...args) => {
+      const res = await stub.fetch(new Request('https://qwizo.internal/do', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ method, args }),
+      }));
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error || `store ${String(method)} failed`);
+      if (body.error) throw new Error(body.error);
+      return body.result;
+    },
+  });
+}
 import {
   hashPassword, verifyPassword, signToken, verifyToken, getTokenFromRequest,
   sessionCookie, clearSessionCookie, newSessionPayload, requireTeacher,
@@ -38,7 +61,7 @@ import { generateQuizQuestions, questionAIAction, QUESTION_TYPES } from './ai.js
 import { gradeSubmission, buildSnapshot, publicQuizPayload, validateQuizForPublish, validateQuestionForPublish } from './grade.js';
 import { extractMaterialText } from './upload.js';
 
-export { TeacherStore };
+export { TeacherStore, TemplateStore };
 
 const CODE_LETTERS = 'BCDFGHJKLMNPQRSTVWXZ';
 const CODE_DIGITS = '23456789';
@@ -240,6 +263,25 @@ async function handlePublishQuiz(req, env, ctx, params) {
     status: 'published', share_code: code,
     published_snapshot: JSON.stringify(snapshot), published_at: Date.now(),
   });
+  // Save to the shared template gallery so other teachers can reuse it.
+  // Re-publishing updates the existing template (keyed by quiz + teacher).
+  // Template saving must never break publishing, so failures are logged only.
+  try {
+    await templateStore(env).upsertTemplate({
+      source_quiz_id: params.id,
+      teacher_id: ctx.user.id,
+      teacher_name: ctx.user.name || '',
+      title: quiz.title,
+      description: quiz.description,
+      subject: quiz.subject,
+      level: quiz.level,
+      topic: quiz.topic,
+      question_count: questions.length,
+      snapshot: { ...snapshot, description: quiz.description, subject: quiz.subject, level: quiz.level, topic: quiz.topic },
+    });
+  } catch (e) {
+    console.error('template save failed', e);
+  }
   return jsonResponse({ quiz: { ...updated, settings: JSON.parse(updated.settings) }, share_code: code });
 }
 
@@ -388,6 +430,71 @@ async function handleListBank(req, env, ctx, params, url) {
     type: sp.get('type') || '', difficulty: sp.get('difficulty') || '',
   });
   return jsonResponse({ items });
+}
+
+/* ================= templates (shared gallery) ================= */
+
+async function handleListTemplates(req, env, ctx, params, url) {
+  const sp = url.searchParams;
+  const { templates, total } = await templateStore(env).listTemplates({
+    search: sp.get('q') || '', subject: sp.get('subject') || '',
+    limit: sp.get('limit') || 24, offset: sp.get('offset') || 0,
+  });
+  return jsonResponse({ templates, total });
+}
+
+async function handleListTemplateSubjects(req, env, ctx) {
+  const subjects = await templateStore(env).listSubjects();
+  return jsonResponse({ subjects });
+}
+
+async function handleGetTemplate(req, env, ctx, params) {
+  const t = await templateStore(env).getTemplate(params.id);
+  if (!t) return err('Template not found', 404);
+  return jsonResponse({ template: t });
+}
+
+async function handleDeleteTemplate(req, env, ctx, params) {
+  try {
+    const ok = await templateStore(env).deleteTemplate(params.id, ctx.user.id);
+    if (!ok) return err('Template not found', 404);
+  } catch (e) {
+    return err(e.message || 'Could not delete template', 403);
+  }
+  return jsonResponse({ ok: true });
+}
+
+/**
+ * Clone a template into the teacher's own quizzes as a new draft.
+ * Child ids (options/pairs) are stripped so fresh UUIDs are minted —
+ * reusing source ids would violate the options.id UNIQUE constraint.
+ */
+async function handleUseTemplate(req, env, ctx, params) {
+  const t = await templateStore(env).getTemplate(params.id);
+  if (!t) return err('Template not found', 404);
+  let snapshot;
+  try {
+    snapshot = JSON.parse(t.snapshot || '{}');
+  } catch (e) {
+    return err('Template data is corrupted', 500);
+  }
+  const quiz = await ctx.store.createQuiz({
+    title: `${t.title} (from template)`.slice(0, 200),
+    description: t.description, subject: t.subject,
+    level: t.level, topic: t.topic,
+    settings: withDefaults((snapshot.quiz && snapshot.quiz.settings) || {}),
+  });
+  for (const q of snapshot.questions || []) {
+    await ctx.store.createQuestion(quiz.id, {
+      type: q.type, text: q.text, explanation: q.explanation || '',
+      marks: q.marks ?? 1, case_sensitive: !!q.case_sensitive,
+      options: (q.options || []).map(o => ({ text: o.text, is_correct: !!o.is_correct })),
+      accepted: (q.accepted || []).map(a => ({ text: a.text })),
+      pairs: (q.pairs || []).map(p => ({ left: p.left, right: p.right })),
+    });
+  }
+  await templateStore(env).incrementUseCount(params.id);
+  return jsonResponse({ quiz: { ...quiz, settings: JSON.parse(quiz.settings) } }, 201);
 }
 
 async function handleCreateBankItem(req, env, ctx) {
@@ -753,6 +860,12 @@ const ROUTES = [
   ['PUT', /^\/api\/bank\/([^/]+)$/, handleUpdateBankItem, true, 'id'],
   ['DELETE', /^\/api\/bank\/([^/]+)$/, handleDeleteBankItem, true, 'id'],
   ['POST', /^\/api\/bank\/([^/]+)\/add-to-quiz$/, handleBankAddToQuiz, true, 'id'],
+  // templates (shared gallery)
+  ['GET', /^\/api\/templates$/, handleListTemplates, true],
+  ['GET', /^\/api\/templates\/subjects$/, handleListTemplateSubjects, true],
+  ['GET', /^\/api\/templates\/([^/]+)$/, handleGetTemplate, true, 'id'],
+  ['POST', /^\/api\/templates\/([^/]+)\/use$/, handleUseTemplate, true, 'id'],
+  ['DELETE', /^\/api\/templates\/([^/]+)$/, handleDeleteTemplate, true, 'id'],
   // AI
   ['POST', /^\/api\/ai\/generate$/, handleAIGenerate, true],
   ['POST', /^\/api\/ai\/generate-upload$/, handleAIGenerateUpload, true],

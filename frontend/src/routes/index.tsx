@@ -13,6 +13,7 @@ import { QuizPreview } from '@/pages/QuizPreview';
 import { ShareQuiz } from '@/pages/ShareQuiz';
 import { QuizResults } from '@/pages/QuizResults';
 import { QuestionBank } from '@/pages/QuestionBank';
+import { Templates } from '@/pages/Templates';
 import { Settings } from '@/pages/Settings';
 import { JoinQuiz } from '@/pages/JoinQuiz';
 import { TakeQuiz } from '@/pages/TakeQuiz';
@@ -48,6 +49,7 @@ export const router = createBrowserRouter([
           { path: 'quizzes/:id/share', element: <ShareQuiz /> },
           { path: 'quizzes/:id/results', element: <QuizResults /> },
           { path: 'question-bank', element: <QuestionBank /> },
+          { path: 'templates', element: <Templates /> },
           { path: 'settings', element: <Settings /> },
         ],
       },

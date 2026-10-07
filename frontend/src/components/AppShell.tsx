@@ -7,6 +7,7 @@ const NAV = [
   { to: '/app', label: 'Home', end: true },
   { to: '/app/quizzes', label: 'Quizzes' },
   { to: '/app/question-bank', label: 'Question Bank' },
+  { to: '/app/templates', label: 'Templates' },
   { to: '/app/settings', label: 'Settings' },
 ];
 

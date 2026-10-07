@@ -200,3 +200,19 @@ export interface StudentResultData {
   incorrect_count?: number;
   questions?: ReviewItem[];
 }
+
+export interface QuizTemplate {
+  id: string;
+  source_quiz_id: string;
+  teacher_id: string;
+  teacher_name: string;
+  title: string;
+  description: string;
+  subject: string;
+  level: string;
+  topic: string;
+  question_count: number;
+  use_count: number;
+  created_at: number;
+  updated_at: number;
+}
