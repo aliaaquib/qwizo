@@ -5,11 +5,51 @@ import { QwizoLogo } from '@/components/QwizoLogo';
 import { api } from '@/lib/api/client';
 
 const NAV = [
-  { to: '/app', label: 'Home', end: true },
-  { to: '/app/quizzes', label: 'My library' },
-  { to: '/app/reports', label: 'Reports' },
-  { to: '/app/students', label: 'Students' },
-  { to: '/app/playground', label: 'Playground' },
+  {
+    to: '/app', label: 'Home', end: true,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V21h14V9.5" />
+      </svg>
+    ),
+  },
+  {
+    to: '/app/quizzes', label: 'My library',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4H6.5A2.5 2.5 0 0 0 4 6.5v13Z" />
+        <path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5" />
+      </svg>
+    ),
+  },
+  {
+    to: '/app/reports', label: 'Reports',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <path d="M3 3v18h18" /><path d="M7 15l4-6 4 3 4-7" />
+      </svg>
+    ),
+  },
+  {
+    to: '/app/students', label: 'Students',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <circle cx="9" cy="8" r="3.5" />
+        <path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6" />
+        <circle cx="17.5" cy="9.5" r="2.5" />
+        <path d="M16 14.6c2.9.4 5.5 2.3 5.5 5.4" />
+      </svg>
+    ),
+  },
+  {
+    to: '/app/playground', label: 'Playground',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+        <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9Z" />
+        <path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9Z" />
+      </svg>
+    ),
+  },
 ];
 
 // Teacher app shell — follows DESIGN_SYSTEM.md.
@@ -42,13 +82,14 @@ export function AppShell() {
               to={n.to}
               end={n.end}
               className={({ isActive }) =>
-                `interact block px-4 py-2.5 rounded-control text-[15px] font-medium ${
+                `interact flex items-center gap-3 px-4 py-2.5 rounded-control text-[15px] font-medium ${
                   isActive
                     ? 'bg-lime/50 text-ink'
                     : 'text-ink/60 hover:text-ink hover:bg-neutral'
                 }`
               }
             >
+              <span className="shrink-0">{n.icon}</span>
               {n.label}
             </NavLink>
           ))}
