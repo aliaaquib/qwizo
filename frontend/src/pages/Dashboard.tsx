@@ -107,10 +107,10 @@ export function Dashboard() {
   return (
     <div>
       {/* greeting */}
-      <h1 className="text-center text-[20px] md:text-[22px] font-bold text-ink tracking-tight">
+      <h1 className="text-center text-[18px] md:text-[20px] font-bold text-ink tracking-tight">
         Good {daypart()}, {firstName}
       </h1>
-      <p className="text-center text-ink/60 text-[13px] mt-1 mb-6">Let's get started.</p>
+      <p className="text-center text-ink/60 text-[12px] mt-1 mb-6">Let's get started.</p>
 
       {/* brand band with overlapping action cards */}
       <div className="relative mb-10">
@@ -130,8 +130,8 @@ export function Dashboard() {
                   flex items-center justify-center text-ink group-hover:bg-lime group-hover:border-lime transition-colors">
                   {a.icon}
                 </span>
-                <span className="block font-bold text-ink text-[14px]">{a.title}</span>
-                <span className="block text-ink/50 text-[12px]">{a.sub}</span>
+                <span className="block font-bold text-ink text-[13px]">{a.title}</span>
+                <span className="block text-ink/50 text-[11px]">{a.sub}</span>
               </Link>
             ))}
           </div>
@@ -149,7 +149,7 @@ export function Dashboard() {
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Search for any topic"
-            className="w-full rounded-full border border-line bg-white pl-12 pr-4 py-3 text-[14px]
+            className="w-full rounded-full border border-line bg-white pl-12 pr-4 py-3 text-[13px]
               placeholder:text-ink/35 focus:outline-none focus:border-lime focus:ring-2 focus:ring-lime/30 transition"
           />
         </div>
@@ -179,13 +179,13 @@ export function Dashboard() {
           {/* browse selectors */}
           <div className="flex items-center gap-4 mb-8">
             <span className="flex-1 h-px bg-line" aria-hidden="true" />
-            <span className="text-ink/60 text-[13px] font-medium whitespace-nowrap">Browse templates for</span>
+            <span className="text-ink/60 text-[12px] font-medium whitespace-nowrap">Browse templates for</span>
             <label className="relative">
               <span className="sr-only">Subject</span>
               <select
                 value={subject}
                 onChange={e => setSubject(e.target.value)}
-                className="appearance-none bg-transparent font-bold text-ink text-[15px] pr-6 py-1
+                className="appearance-none bg-transparent font-bold text-ink text-[14px] pr-6 py-1
                   border-b-2 border-lime cursor-pointer focus:outline-none"
               >
                 <option value="">Subject</option>
@@ -201,7 +201,7 @@ export function Dashboard() {
               <select
                 value={grade}
                 onChange={e => setGrade(e.target.value)}
-                className="appearance-none bg-transparent font-bold text-ink text-[15px] pr-6 py-1
+                className="appearance-none bg-transparent font-bold text-ink text-[14px] pr-6 py-1
                   border-b-2 border-lime cursor-pointer focus:outline-none"
               >
                 <option value="">Grade</option>
@@ -217,10 +217,10 @@ export function Dashboard() {
 
           {/* templates by subject */}
           <div className="flex items-baseline gap-3 mb-4">
-            <h3 className="text-[14px] font-bold">Templates</h3>
+            <h3 className="text-[13px] font-bold">Templates</h3>
             <Link
               to="/app/templates"
-              className="text-[13px] font-semibold underline underline-offset-4 decoration-ink/30
+              className="text-[12px] font-semibold underline underline-offset-4 decoration-ink/30
                 hover:decoration-ink flex items-center gap-1"
             >
               See all <span aria-hidden="true">→</span>
@@ -251,8 +251,8 @@ export function Dashboard() {
                   />
                   <div className="flex gap-8">
                     <div className="w-48 shrink-0">
-                      <h4 className="text-[17px] font-bold text-ink leading-tight">{g.subject}</h4>
-                      <p className="text-[12px] text-ink/50 mt-1">
+                      <h4 className="text-[15px] font-bold text-ink leading-tight">{g.subject}</h4>
+                      <p className="text-[11px] text-ink/50 mt-1">
                         {g.templates.length} template{g.templates.length === 1 ? '' : 's'}
                       </p>
                     </div>
@@ -263,12 +263,12 @@ export function Dashboard() {
                           to="/app/templates"
                           className="flex items-baseline gap-4 py-2.5 group/tmpl"
                         >
-                          <span className="text-[13px] text-ink/50 w-20 shrink-0">Template {i + 1}</span>
-                          <span className="text-[14px] font-medium text-ink truncate
+                          <span className="text-[12px] text-ink/50 w-20 shrink-0">Template {i + 1}</span>
+                          <span className="text-[13px] font-medium text-ink truncate
                             group-hover/tmpl:underline group-hover/tmpl:decoration-lime group-hover/tmpl:underline-offset-4">
                             {t.title}
                           </span>
-                          <span className="ml-auto text-[12px] text-ink/40 shrink-0">
+                          <span className="ml-auto text-[11px] text-ink/40 shrink-0">
                             {t.question_count} questions
                           </span>
                         </Link>
@@ -276,7 +276,7 @@ export function Dashboard() {
                       {g.templates.length > 3 && (
                         <Link
                           to={`/app/templates?subject=${encodeURIComponent(g.subject)}`}
-                          className="inline-flex items-center gap-2 mt-2 text-[13px] font-bold text-ink
+                          className="inline-flex items-center gap-2 mt-2 text-[12px] font-bold text-ink
                             hover:underline hover:decoration-lime hover:underline-offset-4"
                         >
                           See all <span aria-hidden="true">→</span>
