@@ -74,7 +74,7 @@ export function AppShell() {
       <aside className="w-60 shrink-0 bg-paper border-r border-line flex flex-col
         sticky top-0 h-screen overflow-y-auto">
         <div className="px-6 py-5">
-          <QwizoLogo markSize={28} />
+          <QwizoLogo badge badgeSize={40} />
         </div>
         <nav className="flex-1 px-3 space-y-1">
           {NAV.map(n => (
