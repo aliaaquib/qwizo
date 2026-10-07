@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api } from '@/lib/api/client';
 import type { Quiz } from '@/types';
 import { PageHead, EmptyState, useConfirm, useToast } from '@/components/shared';
-import { StatusBadge } from '@/pages/Dashboard';
+import { StatusBadge } from '@/components/shared';
 import { Button, IconButton, Input } from '@/components/ui';
 
 type QuizRow = Quiz & { question_count?: number; submission_count?: number };
