@@ -99,9 +99,9 @@ export function QuizList() {
   };
 
   return (
-    <div className="flex gap-8">
-      {/* sub-sidebar */}
-      <aside className="w-52 shrink-0 hidden md:block">
+    <div className="flex -mx-8 -my-10">
+      {/* sub-sidebar — flush against the main sidebar */}
+      <aside className="w-60 shrink-0 hidden md:block bg-paper border-r border-line px-6 py-8">
         <h2 className="text-[18px] font-bold text-ink mb-4">Library</h2>
         <nav className="space-y-1">
           {FILTERS.map(f => (
@@ -123,7 +123,7 @@ export function QuizList() {
       </aside>
 
       {/* main */}
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 px-8 py-10">
         {/* search */}
         <div className="relative mb-6">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
