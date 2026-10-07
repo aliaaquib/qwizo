@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthContext';
 import { QwizoLogo } from '@/components/QwizoLogo';
@@ -60,6 +60,16 @@ export function AppShell() {
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const [menuPos, setMenuPos] = useState({ left: 0, bottom: 0 });
+
+  const toggleMenu = () => {
+    if (!menuOpen && btnRef.current) {
+      const r = btnRef.current.getBoundingClientRect();
+      setMenuPos({ left: Math.min(r.left, window.innerWidth - 210), bottom: window.innerHeight - r.top + 8 });
+    }
+    setMenuOpen(o => !o);
+  };
 
   const logout = async () => {
     await api.logout().catch(() => {});
@@ -113,9 +123,9 @@ export function AppShell() {
         </nav>
         {/* profile card */}
         <div className="p-4 border-t border-line">
-          <div className="relative">
             <button
-              onClick={() => setMenuOpen(o => !o)}
+              ref={btnRef}
+              onClick={toggleMenu}
               className={`w-full flex items-center gap-3 rounded-2xl py-2 text-left
                 hover:bg-neutral transition-colors focus-visible:outline-2 focus-visible:outline-lime
                 ${collapsed ? 'justify-center px-0' : 'px-2'}`}
@@ -143,15 +153,15 @@ export function AppShell() {
             {menuOpen && (
               <>
                 <span
-                  className="fixed inset-0 z-10"
+                  className="fixed inset-0 z-40"
                   onClick={() => setMenuOpen(false)}
                   aria-hidden="true"
                 />
                 <div
                   role="menu"
-                  className={`absolute bottom-full mb-2 z-20 bg-white border border-line
-                    rounded-2xl shadow-lift py-1.5 overflow-hidden
-                    ${collapsed ? 'left-0 w-48' : 'left-0 right-0'}`}
+                  style={{ left: menuPos.left, bottom: menuPos.bottom }}
+                  className="fixed z-50 w-48 bg-white border border-line
+                    rounded-2xl shadow-lift py-1.5 overflow-hidden"
                 >
                   <Link
                     to="/app/settings"
@@ -181,7 +191,6 @@ export function AppShell() {
                 </div>
               </>
             )}
-          </div>
         </div>
       </aside>
       <main className="flex-1 min-w-0">
